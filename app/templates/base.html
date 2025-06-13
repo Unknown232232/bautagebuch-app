@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="de" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -37,6 +37,19 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body class="bg-gray-50 min-h-screen {% block body_class %}{% endblock %}">
+
+    <!-- Dark Mode Toggle for non-authenticated users -->
+    {% if not current_user.is_authenticated %}
+    <div class="fixed top-4 right-4 z-50">
+        <button class="theme-toggle bg-white dark:bg-gray-800 p-2 rounded-full shadow-lg border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-200" 
+                aria-label="Theme umschalten" 
+                title="Zwischen Light und Dark Mode wechseln">
+            <div class="theme-toggle-slider">
+                <i data-lucide="sun" class="w-5 h-5 text-gray-600 dark:text-gray-300"></i>
+            </div>
+        </button>
+    </div>
+    {% endif %}
 
     <!-- Navigation -->
     {% if current_user.is_authenticated %}

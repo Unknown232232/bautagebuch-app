@@ -96,14 +96,39 @@ class DarkModeManager {
     }
 
     setupToggle() {
-        // Create toggle button if it doesn't exist
+        // Create toggle button if it doesn't exist (for authenticated users)
         this.createToggleButton();
+        
+        // Setup existing toggle buttons (for non-authenticated users)
+        this.setupExistingToggleButtons();
         
         // Update button state
         this.updateToggleButton();
         
         // Listen for system theme changes
         this.listenForSystemThemeChanges();
+    }
+
+    setupExistingToggleButtons() {
+        // Find existing toggle buttons (for non-authenticated users)
+        const existingToggles = document.querySelectorAll('.theme-toggle');
+        
+        existingToggles.forEach(toggle => {
+            // Remove existing event listeners to avoid duplicates
+            const newToggle = toggle.cloneNode(true);
+            toggle.parentNode.replaceChild(newToggle, toggle);
+            
+            // Add click event
+            newToggle.addEventListener('click', () => this.toggleTheme());
+            
+            // Add keyboard support
+            newToggle.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    this.toggleTheme();
+                }
+            });
+        });
     }
 
     createToggleButton() {
@@ -155,18 +180,19 @@ class DarkModeManager {
     }
 
     updateToggleButton() {
-        const slider = document.querySelector('.theme-toggle-slider');
-        if (slider) {
+        // Update all toggle buttons and sliders
+        const sliders = document.querySelectorAll('.theme-toggle-slider');
+        sliders.forEach(slider => {
             this.updateSliderIcon(slider, this.currentTheme);
-        }
+        });
         
-        const toggle = document.querySelector('.theme-toggle');
-        if (toggle) {
+        const toggles = document.querySelectorAll('.theme-toggle');
+        toggles.forEach(toggle => {
             const newTitle = this.currentTheme === 'light' 
                 ? 'Zu Dark Mode wechseln' 
                 : 'Zu Light Mode wechseln';
             toggle.setAttribute('title', newTitle);
-        }
+        });
     }
 
     updateSliderIcon(slider, theme) {

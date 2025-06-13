@@ -3,7 +3,7 @@ Dashboard-Routen für verschiedene Benutzerrollen
 """
 from flask import Blueprint, render_template, redirect, url_for
 from flask_login import login_required, current_user
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from sqlalchemy import func
 from app import db
 from app.models.user import User
@@ -32,7 +32,7 @@ def mitarbeiter():
         return redirect(url_for('dashboard.index'))
     
     # Statistiken für den aktuellen Benutzer
-    heute = datetime.now().date()
+    heute = datetime.now(timezone.utc).date()
     diese_woche = heute - timedelta(days=heute.weekday())
     
     aufmasse_heute = AufmassEntry.query.filter(
@@ -68,7 +68,7 @@ def bauleiter():
         return redirect(url_for('dashboard.index'))
     
     # Umfassende Statistiken
-    heute = datetime.now().date()
+    heute = datetime.now(timezone.utc).date()
     diese_woche = heute - timedelta(days=heute.weekday())
     dieser_monat = heute.replace(day=1)
     

@@ -9,7 +9,7 @@ from app.models.material import Material
 from app.models.aufmass import AufmassEntry
 from app.models.user import User
 from sqlalchemy import func
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 api_bp = Blueprint('api', __name__)
 logger = logging.getLogger(__name__)
@@ -57,18 +57,18 @@ def dashboard_stats():
         total_entries = base_query.count()
         
         # Entries this month
-        start_of_month = datetime.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        start_of_month = datetime.now(timezone.utc).replace(day=1, hour=0, minute=0, second=0, microsecond=0)
         entries_this_month = base_query.filter(AufmassEntry.created_at >= start_of_month).count()
         
         # Entries today
-        start_of_day = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+        start_of_day = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
         entries_today = base_query.filter(AufmassEntry.created_at >= start_of_day).count()
         
         # Active materials count
         active_materials = Material.query.filter_by(ist_aktiv=True).count()
         
         # Recent entries (last 7 days)
-        week_ago = datetime.now() - timedelta(days=7)
+        week_ago = datetime.now(timezone.utc) - timedelta(days=7)
         recent_entries = base_query.filter(AufmassEntry.created_at >= week_ago).count()
         
         stats = {
@@ -150,7 +150,7 @@ def validate_aufmass():
                 ort=data['ort'],
                 mitarbeiter_id=current_user.id
             ).filter(
-                AufmassEntry.created_at >= datetime.now() - timedelta(hours=1)
+                AufmassEntry.created_at >= datetime.now(timezone.utc) - timedelta(hours=1)
             ).first()
             
             if duplicate_check:
@@ -249,7 +249,7 @@ def health():
         
         return jsonify({
             'status': 'healthy',
-            'timestamp': datetime.now().isoformat(),
+            'timestamp': datetime.now(timezone.utc).isoformat(),
             'version': '1.0.0'
         })
     except Exception as e:
@@ -257,7 +257,7 @@ def health():
         return jsonify({
             'status': 'unhealthy',
             'error': str(e),
-            'timestamp': datetime.now().isoformat()
+            'timestamp': datetime.now(timezone.utc).isoformat()
         }), 500
 
 

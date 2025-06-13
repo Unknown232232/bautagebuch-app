@@ -1,736 +1,26 @@
 {% extends "base.html" %}
 {% block title %}Aufmaß erfassen - Bautagebuch{% endblock %}
 
-{% block extra_css %}
-<style>
-    /* Modern Design Variables */
-    :root {
-        --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        --gradient-success: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-        --shadow-card: 0 10px 30px rgba(0, 0, 0, 0.1);
-        --shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.15);
-        --border-radius: 16px;
-        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    /* Page Layout */
-    .aufmass-container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 2rem;
-        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-        min-height: 100vh;
-    }
-
-    /* Header Section */
-    .page-header {
-        background: var(--gradient-primary);
-        border-radius: var(--border-radius);
-        padding: 2rem;
-        margin-bottom: 2rem;
-        color: white;
-        box-shadow: var(--shadow-card);
-        position: relative;
-        overflow: hidden;
-    }
-
-    .page-header::before {
-        content: '';
-        position: absolute;
-        top: -50%;
-        right: -50%;
-        width: 100%;
-        height: 100%;
-        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-        animation: float 6s ease-in-out infinite;
-    }
-
-    @keyframes float {
-        0%, 100% { transform: translateY(0px) rotate(0deg); }
-        50% { transform: translateY(-20px) rotate(180deg); }
-    }
-
-    .header-content {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        position: relative;
-        z-index: 2;
-    }
-
-    .header-title {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-    }
-
-    .header-icon {
-        width: 60px;
-        height: 60px;
-        background: rgba(255, 255, 255, 0.2);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.5rem;
-        backdrop-filter: blur(10px);
-    }
-
-    .header-text h1 {
-        font-size: 2rem;
-        font-weight: 700;
-        margin: 0;
-        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-
-    .header-text p {
-        margin: 0.5rem 0 0 0;
-        opacity: 0.9;
-        font-size: 1.1rem;
-    }
-
-    .date-display {
-        text-align: right;
-        background: rgba(255, 255, 255, 0.1);
-        padding: 1rem;
-        border-radius: 12px;
-        backdrop-filter: blur(10px);
-    }
-
-    .date-display .date-label {
-        font-size: 0.9rem;
-        opacity: 0.8;
-        margin-bottom: 0.5rem;
-    }
-
-    .date-display .date-value {
-        font-size: 1.2rem;
-        font-weight: 600;
-    }
-
-    /* Form Container */
-    .form-container {
-        background: white;
-        border-radius: var(--border-radius);
-        box-shadow: var(--shadow-card);
-        overflow: hidden;
-        margin-bottom: 2rem;
-        transition: var(--transition);
-    }
-
-    .form-container:hover {
-        box-shadow: var(--shadow-hover);
-        transform: translateY(-2px);
-    }
-
-    /* Form Sections */
-    .form-section {
-        padding: 2rem;
-        border-bottom: 1px solid #f0f0f0;
-        position: relative;
-    }
-
-    .form-section:last-child {
-        border-bottom: none;
-    }
-
-    .section-header {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        margin-bottom: 1.5rem;
-        padding-bottom: 1rem;
-        border-bottom: 2px solid #f8f9fa;
-    }
-
-    .section-icon {
-        width: 48px;
-        height: 48px;
-        background: var(--gradient-primary);
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 1.2rem;
-        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-    }
-
-    .section-title {
-        font-size: 1.3rem;
-        font-weight: 600;
-        color: #2d3748;
-        margin: 0;
-    }
-
-    .section-subtitle {
-        font-size: 0.9rem;
-        color: #718096;
-        margin: 0.25rem 0 0 0;
-    }
-
-    /* Form Fields */
-    .field-group {
-        margin-bottom: 1.5rem;
-    }
-
-    .field-row {
-        display: grid;
-        grid-template-columns: 2fr 1fr;
-        gap: 1.5rem;
-        align-items: end;
-    }
-
-    .field-row.equal {
-        grid-template-columns: 1fr 1fr;
-    }
-
-    .field-row.single {
-        grid-template-columns: 1fr;
-    }
-
-    .form-label {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-weight: 600;
-        color: #2d3748;
-        margin-bottom: 0.5rem;
-        font-size: 0.95rem;
-    }
-
-    .form-label .required {
-        color: #e53e3e;
-    }
-
-    .form-label svg {
-        width: 16px;
-        height: 16px;
-        color: #667eea;
-    }
-
-    .form-control {
-        width: 100%;
-        padding: 0.875rem 1rem;
-        border: 2px solid #e2e8f0;
-        border-radius: 12px;
-        font-size: 1rem;
-        transition: var(--transition);
-        background: #fafafa;
-    }
-
-    .form-control:focus {
-        outline: none;
-        border-color: #667eea;
-        background: white;
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        transform: translateY(-1px);
-    }
-
-    .form-control:hover {
-        border-color: #cbd5e0;
-        background: white;
-    }
-
-    .form-select {
-        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
-        background-position: right 0.75rem center;
-        background-repeat: no-repeat;
-        background-size: 1.5em 1.5em;
-        padding-right: 2.5rem;
-    }
-
-    .auto-fill-field {
-        background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
-        border-color: #e2e8f0;
-        color: #4a5568;
-        font-style: italic;
-    }
-
-    /* File Upload Area */
-    .file-upload-section {
-        background: linear-gradient(135deg, #f8f9ff 0%, #f0f4ff 100%);
-        border: 2px dashed #c3d9ff;
-        border-radius: var(--border-radius);
-        padding: 3rem 2rem;
-        text-align: center;
-        transition: var(--transition);
-        cursor: pointer;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .file-upload-section:hover {
-        border-color: #667eea;
-        background: linear-gradient(135deg, #f0f4ff 0%, #e6f0ff 100%);
-        transform: scale(1.02);
-    }
-
-    .file-upload-section.dragover {
-        border-color: #4facfe;
-        background: linear-gradient(135deg, #e6f7ff 0%, #d6f5ff 100%);
-        transform: scale(1.05);
-    }
-
-    .upload-icon {
-        width: 80px;
-        height: 80px;
-        margin: 0 auto 1rem;
-        background: var(--gradient-primary);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 2rem;
-        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
-    }
-
-    .upload-text {
-        font-size: 1.1rem;
-        font-weight: 600;
-        color: #4a5568;
-        margin-bottom: 0.5rem;
-    }
-
-    .upload-hint {
-        color: #718096;
-        font-size: 0.9rem;
-    }
-
-    .file-input {
-        position: absolute;
-        opacity: 0;
-        width: 100%;
-        height: 100%;
-        cursor: pointer;
-    }
-
-    /* File Preview */
-    .file-preview {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-        gap: 1rem;
-        margin-top: 1rem;
-    }
-
-    .preview-item {
-        background: white;
-        border-radius: 12px;
-        padding: 1rem;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        text-align: center;
-        transition: var(--transition);
-    }
-
-    .preview-item:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-    }
-
-    .preview-image {
-        width: 80px;
-        height: 80px;
-        object-fit: cover;
-        border-radius: 8px;
-        margin-bottom: 0.5rem;
-    }
-
-    .preview-file-icon {
-        width: 80px;
-        height: 80px;
-        background: var(--gradient-secondary);
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 2rem;
-        margin: 0 auto 0.5rem;
-    }
-
-    .preview-filename {
-        font-size: 0.8rem;
-        color: #4a5568;
-        word-break: break-all;
-    }
-
-    /* Duplicate Warning */
-    .duplicate-warning {
-        background: linear-gradient(135deg, #fff5cd 0%, #fef3c7 100%);
-        border: 2px solid #f59e0b;
-        border-radius: 12px;
-        padding: 1rem;
-        margin: 1rem 0;
-        display: none;
-        animation: slideIn 0.3s ease-out;
-    }
-
-    @keyframes slideIn {
-        from { opacity: 0; transform: translateY(-10px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-
-    .duplicate-warning.show {
-        display: block;
-    }
-
-    .warning-header {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-weight: 600;
-        color: #92400e;
-        margin-bottom: 0.5rem;
-    }
-
-    .warning-icon {
-        width: 20px;
-        height: 20px;
-        color: #f59e0b;
-    }
-
-    .warning-message {
-        color: #78350f;
-        margin: 0;
-    }
-
-    /* Action Buttons */
-    .form-actions {
-        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-        padding: 2rem;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 1rem;
-    }
-
-    .btn-group {
-        display: flex;
-        gap: 1rem;
-    }
-
-    .btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.875rem 1.5rem;
-        border: none;
-        border-radius: 12px;
-        font-size: 1rem;
-        font-weight: 600;
-        text-decoration: none;
-        cursor: pointer;
-        transition: var(--transition);
-        position: relative;
-        overflow: hidden;
-    }
-
-    .btn::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-        transition: left 0.5s;
-    }
-
-    .btn:hover::before {
-        left: 100%;
-    }
-
-    .btn-primary {
-        background: var(--gradient-primary);
-        color: white;
-        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-    }
-
-    .btn-primary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
-    }
-
-    .btn-secondary {
-        background: #f8f9fa;
-        color: #6c757d;
-        border: 2px solid #e9ecef;
-    }
-
-    .btn-secondary:hover {
-        background: #e9ecef;
-        border-color: #dee2e6;
-        transform: translateY(-1px);
-    }
-
-    .btn-back {
-        background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
-        color: white;
-    }
-
-    .btn-back:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(108, 117, 125, 0.4);
-    }
-
-    /* Recent Entries Section */
-    .recent-entries {
-        background: white;
-        border-radius: var(--border-radius);
-        box-shadow: var(--shadow-card);
-        overflow: hidden;
-    }
-
-    .recent-header {
-        background: var(--gradient-success);
-        color: white;
-        padding: 1.5rem 2rem;
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-    }
-
-    .recent-icon {
-        width: 40px;
-        height: 40px;
-        background: rgba(255, 255, 255, 0.2);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.1rem;
-    }
-
-    .recent-title {
-        font-size: 1.2rem;
-        font-weight: 600;
-        margin: 0;
-    }
-
-    .recent-list {
-        max-height: 400px;
-        overflow-y: auto;
-    }
-
-    .recent-item {
-        padding: 1.5rem 2rem;
-        border-bottom: 1px solid #f0f0f0;
-        transition: var(--transition);
-        cursor: pointer;
-    }
-
-    .recent-item:hover {
-        background: linear-gradient(135deg, #f8f9ff 0%, #f0f4ff 100%);
-        transform: translateX(4px);
-    }
-
-    .recent-item:last-child {
-        border-bottom: none;
-    }
-
-    .item-content {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .item-main {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-    }
-
-    .item-icon {
-        width: 40px;
-        height: 40px;
-        background: var(--gradient-primary);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 0.9rem;
-    }
-
-    .item-details h4 {
-        font-size: 1rem;
-        font-weight: 600;
-        color: #2d3748;
-        margin: 0 0 0.25rem 0;
-    }
-
-    .item-details p {
-        font-size: 0.9rem;
-        color: #718096;
-        margin: 0;
-    }
-
-    .item-meta {
-        text-align: right;
-    }
-
-    .item-date {
-        font-size: 0.9rem;
-        font-weight: 600;
-        color: #4a5568;
-        margin-bottom: 0.25rem;
-    }
-
-    .item-user {
-        font-size: 0.8rem;
-        color: #718096;
-    }
-
-    .empty-state {
-        padding: 3rem 2rem;
-        text-align: center;
-        color: #718096;
-    }
-
-    .empty-icon {
-        width: 80px;
-        height: 80px;
-        margin: 0 auto 1rem;
-        background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 2rem;
-        color: #a0aec0;
-    }
-
-    /* Flash Messages */
-    .flash-messages {
-        margin-bottom: 2rem;
-    }
-
-    .flash-message {
-        padding: 1rem 1.5rem;
-        border-radius: 12px;
-        margin-bottom: 1rem;
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        animation: slideIn 0.3s ease-out;
-    }
-
-    .flash-success {
-        background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
-        border: 2px solid #28a745;
-        color: #155724;
-    }
-
-    .flash-error {
-        background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
-        border: 2px solid #dc3545;
-        color: #721c24;
-    }
-
-    .flash-warning {
-        background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
-        border: 2px solid #ffc107;
-        color: #856404;
-    }
-
-    .flash-icon {
-        width: 20px;
-        height: 20px;
-        flex-shrink: 0;
-    }
-
-    /* Responsive Design */
-    @media (max-width: 768px) {
-        .aufmass-container {
-            padding: 1rem;
-        }
-
-        .header-content {
-            flex-direction: column;
-            gap: 1rem;
-            text-align: center;
-        }
-
-        .field-row {
-            grid-template-columns: 1fr;
-            gap: 1rem;
-        }
-
-        .form-actions {
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .btn-group {
-            width: 100%;
-            justify-content: center;
-        }
-
-        .item-content {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 0.5rem;
-        }
-
-        .item-meta {
-            text-align: left;
-        }
-    }
-
-    /* Loading States */
-    .loading {
-        opacity: 0.6;
-        pointer-events: none;
-        position: relative;
-    }
-
-    .loading::after {
-        content: '';
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        width: 20px;
-        height: 20px;
-        margin: -10px 0 0 -10px;
-        border: 2px solid #f3f3f3;
-        border-top: 2px solid #667eea;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-
-    .invalid-feedback {
-        display: block;
-        color: #e53e3e;
-        font-size: 0.875rem;
-        margin-top: 0.25rem;
-    }
-</style>
-{% endblock %}
-
 {% block content %}
-<div class="aufmass-container">
+<div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
     <!-- Page Header -->
-    <div class="page-header">
-        <div class="header-content">
-            <div class="header-title">
-                <div class="header-icon">
-                    <i class="fas fa-ruler-combined"></i>
+    <div class="px-4 py-6 sm:px-0">
+        <div class="bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg p-6 text-white shadow-lg relative overflow-hidden">
+            <div class="absolute inset-0 bg-white opacity-10 transform -skew-y-6"></div>
+            <div class="relative flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div class="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center backdrop-blur-sm">
+                        <i data-lucide="ruler" class="w-8 h-8"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-3xl font-bold">Aufmaß erfassen</h1>
+                        <p class="text-blue-100 mt-1">Neue Leistung dokumentieren und verwalten</p>
+                    </div>
                 </div>
-                <div class="header-text">
-                    <h1>Aufmaß erfassen</h1>
-                    <p>Neue Leistung dokumentieren und verwalten</p>
+                <div class="text-right bg-white bg-opacity-10 rounded-lg p-4 backdrop-blur-sm">
+                    <div class="text-sm text-blue-100">Heute</div>
+                    <div class="text-lg font-semibold" id="current-date"></div>
                 </div>
-            </div>
-            <div class="date-display">
-                <div class="date-label">Heute</div>
-                <div class="date-value" id="current-date"></div>
             </div>
         </div>
     </div>
@@ -738,19 +28,25 @@
     <!-- Flash Messages -->
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
-            <div class="flash-messages">
+            <div class="px-4 py-6 sm:px-0">
                 {% for category, message in messages %}
-                    <div class="flash-message flash-{{ 'error' if category == 'error' else category }}">
-                        <svg class="flash-icon" fill="currentColor" viewBox="0 0 20 20">
-                            {% if category == 'error' %}
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
-                            {% elif category == 'warning' %}
-                                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
-                            {% else %}
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-                            {% endif %}
-                        </svg>
-                        <span>{{ message }}</span>
+                    <div class="mb-4 p-4 rounded-lg {% if category == 'error' %}bg-red-50 text-red-700 border border-red-200{% elif category == 'success' %}bg-green-50 text-green-700 border border-green-200{% elif category == 'warning' %}bg-yellow-50 text-yellow-700 border border-yellow-200{% else %}bg-blue-50 text-blue-700 border border-blue-200{% endif %}">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                {% if category == 'error' %}
+                                    <i data-lucide="alert-circle" class="w-5 h-5"></i>
+                                {% elif category == 'success' %}
+                                    <i data-lucide="check-circle" class="w-5 h-5"></i>
+                                {% elif category == 'warning' %}
+                                    <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+                                {% else %}
+                                    <i data-lucide="info" class="w-5 h-5"></i>
+                                {% endif %}
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm font-medium">{{ message }}</p>
+                            </div>
+                        </div>
                     </div>
                 {% endfor %}
             </div>
@@ -758,294 +54,276 @@
     {% endwith %}
 
     <!-- Main Form -->
-    <div class="form-container">
-        <form method="POST" enctype="multipart/form-data" id="aufmassForm">
-            {{ form.hidden_tag() }}
-            
-            <!-- Was? Section -->
-            <div class="form-section">
-                <div class="section-header">
-                    <div class="section-icon">
-                        <i class="fas fa-tools"></i>
-                    </div>
-                    <div>
-                        <h3 class="section-title">Was wurde gemacht?</h3>
-                        <p class="section-subtitle">Wählen Sie das Material oder die Leistung aus</p>
-                    </div>
-                </div>
+    <div class="px-4 py-6 sm:px-0">
+        <div class="bg-white shadow rounded-lg overflow-hidden">
+            <form method="POST" enctype="multipart/form-data" id="aufmassForm">
+                {{ form.hidden_tag() }}
                 
-                <div class="field-row">
-                    <div class="field-group">
-                        <label class="form-label">
-                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
-                            </svg>
-                            Material/Leistung <span class="required">*</span>
-                        </label>
-                        {{ form.material_id(class="form-control form-select") }}
-                        {% for error in form.material_id.errors %}
-                            <div class="invalid-feedback">{{ error }}</div>
-                        {% endfor %}
+                <!-- Was? Section -->
+                <div class="p-6 border-b border-gray-200">
+                    <div class="flex items-center space-x-3 mb-6">
+                        <div class="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
+                            <i data-lucide="wrench" class="w-6 h-6 text-white"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-medium text-gray-900">Was wurde gemacht?</h3>
+                            <p class="text-sm text-gray-500">Wählen Sie das Material oder die Leistung aus</p>
+                        </div>
                     </div>
-                    <div class="field-group">
-                        <label class="form-label">
-                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM7 3H5a2 2 0 00-2 2v12a4 4 0 004 4h2M9 3h10a2 2 0 012 2v12a4 4 0 01-2 2H9M9 3v18"></path>
-                            </svg>
-                            Einheit
-                        </label>
-                        <input type="text" id="auto_einheit" class="form-control auto-fill-field" readonly placeholder="Wird automatisch gefüllt">
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <i data-lucide="package" class="w-4 h-4 inline mr-1"></i>
+                                Material/Leistung <span class="text-red-500">*</span>
+                            </label>
+                            {{ form.material_id(class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500") }}
+                            {% for error in form.material_id.errors %}
+                                <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <i data-lucide="ruler" class="w-4 h-4 inline mr-1"></i>
+                                Einheit
+                            </label>
+                            <input type="text" id="auto_einheit" class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-500" readonly placeholder="Wird automatisch gefüllt">
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Wo? Section -->
-            <div class="form-section">
-                <div class="section-header">
-                    <div class="section-icon">
-                        <i class="fas fa-map-marker-alt"></i>
+                <!-- Wo? Section -->
+                <div class="p-6 border-b border-gray-200">
+                    <div class="flex items-center space-x-3 mb-6">
+                        <div class="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center">
+                            <i data-lucide="map-pin" class="w-6 h-6 text-white"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-medium text-gray-900">Wo wurde gearbeitet?</h3>
+                            <p class="text-sm text-gray-500">Geben Sie den genauen Arbeitsort an</p>
+                        </div>
                     </div>
-                    <div>
-                        <h3 class="section-title">Wo wurde gearbeitet?</h3>
-                        <p class="section-subtitle">Geben Sie den genauen Arbeitsort an</p>
-                    </div>
-                </div>
-                
-                <div class="field-row">
-                    <div class="field-group">
-                        <label class="form-label">
-                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                            </svg>
-                            Ort/Bereich <span class="required">*</span>
-                        </label>
-                        {{ form.ort(class="form-control", placeholder="z.B. Erdgeschoss, Keller, Außenbereich") }}
-                        {% for error in form.ort.errors %}
-                            <div class="invalid-feedback">{{ error }}</div>
-                        {% endfor %}
-                    </div>
-                    <div class="field-group">
-                        <label class="form-label">
-                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-                            </svg>
-                            Raumnummer
-                        </label>
-                        {{ form.raumnummer(class="form-control", placeholder="z.B. R001, Büro 1") }}
-                        {% for error in form.raumnummer.errors %}
-                            <div class="invalid-feedback">{{ error }}</div>
-                        {% endfor %}
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <i data-lucide="map-pin" class="w-4 h-4 inline mr-1"></i>
+                                Ort/Bereich <span class="text-red-500">*</span>
+                            </label>
+                            {{ form.ort(class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500", placeholder="z.B. Erdgeschoss, Keller, Außenbereich") }}
+                            {% for error in form.ort.errors %}
+                                <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <i data-lucide="building" class="w-4 h-4 inline mr-1"></i>
+                                Raumnummer
+                            </label>
+                            {{ form.raumnummer(class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500", placeholder="z.B. R001, Büro 1") }}
+                            {% for error in form.raumnummer.errors %}
+                                <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+                            {% endfor %}
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Wie viel? Section -->
-            <div class="form-section">
-                <div class="section-header">
-                    <div class="section-icon">
-                        <i class="fas fa-calculator"></i>
+                <!-- Wie viel? Section -->
+                <div class="p-6 border-b border-gray-200">
+                    <div class="flex items-center space-x-3 mb-6">
+                        <div class="w-12 h-12 bg-purple-600 rounded-lg flex items-center justify-center">
+                            <i data-lucide="calculator" class="w-6 h-6 text-white"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-medium text-gray-900">Wie viel wurde gemacht?</h3>
+                            <p class="text-sm text-gray-500">Geben Sie die Menge und Einheit an</p>
+                        </div>
                     </div>
-                    <div>
-                        <h3 class="section-title">Wie viel wurde gemacht?</h3>
-                        <p class="section-subtitle">Geben Sie die Menge und Einheit an</p>
-                    </div>
-                </div>
-                
-                <div class="field-row equal">
-                    <div class="field-group">
-                        <label class="form-label">
-                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM7 3H5a2 2 0 00-2 2v12a4 4 0 004 4h2M9 3h10a2 2 0 012 2v12a4 4 0 01-2 2H9M9 3v18"></path>
-                            </svg>
-                            Menge <span class="required">*</span>
-                        </label>
-                        {{ form.menge(class="form-control", placeholder="0.00", step="0.01") }}
-                        {% for error in form.menge.errors %}
-                            <div class="invalid-feedback">{{ error }}</div>
-                        {% endfor %}
-                    </div>
-                    <div class="field-group">
-                        <label class="form-label">
-                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
-                            </svg>
-                            Einheit
-                        </label>
-                        {{ form.einheit(class="form-control", placeholder="m², Stk, lfdm") }}
-                        {% for error in form.einheit.errors %}
-                            <div class="invalid-feedback">{{ error }}</div>
-                        {% endfor %}
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <i data-lucide="hash" class="w-4 h-4 inline mr-1"></i>
+                                Menge <span class="text-red-500">*</span>
+                            </label>
+                            {{ form.menge(class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500", placeholder="0.00", step="0.01") }}
+                            {% for error in form.menge.errors %}
+                                <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <i data-lucide="ruler" class="w-4 h-4 inline mr-1"></i>
+                                Einheit
+                            </label>
+                            {{ form.einheit(class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500", placeholder="m², Stk, lfdm") }}
+                            {% for error in form.einheit.errors %}
+                                <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+                            {% endfor %}
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Wann? Section -->
-            <div class="form-section">
-                <div class="section-header">
-                    <div class="section-icon">
-                        <i class="fas fa-calendar-alt"></i>
+                <!-- Wann? Section -->
+                <div class="p-6 border-b border-gray-200">
+                    <div class="flex items-center space-x-3 mb-6">
+                        <div class="w-12 h-12 bg-yellow-600 rounded-lg flex items-center justify-center">
+                            <i data-lucide="calendar" class="w-6 h-6 text-white"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-medium text-gray-900">Wann wurde gearbeitet?</h3>
+                            <p class="text-sm text-gray-500">Datum und Mitarbeiter</p>
+                        </div>
                     </div>
-                    <div>
-                        <h3 class="section-title">Wann wurde gearbeitet?</h3>
-                        <p class="section-subtitle">Datum und Mitarbeiter</p>
-                    </div>
-                </div>
-                
-                <div class="field-row equal">
-                    <div class="field-group">
-                        <label class="form-label">
-                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                            </svg>
-                            Datum <span class="required">*</span>
-                        </label>
-                        {{ form.datum(class="form-control") }}
-                        {% for error in form.datum.errors %}
-                            <div class="invalid-feedback">{{ error }}</div>
-                        {% endfor %}
-                    </div>
-                    <div class="field-group">
-                        <label class="form-label">
-                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                            </svg>
-                            Mitarbeiter
-                        </label>
-                        <input type="text" class="form-control auto-fill-field" value="{{ current_user.username }}" readonly>
-                        <small style="color: #718096; font-size: 0.8rem; margin-top: 0.25rem; display: block;">Automatisch als aktueller Benutzer gesetzt</small>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <i data-lucide="calendar" class="w-4 h-4 inline mr-1"></i>
+                                Datum <span class="text-red-500">*</span>
+                            </label>
+                            {{ form.datum(class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500") }}
+                            {% for error in form.datum.errors %}
+                                <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <i data-lucide="user" class="w-4 h-4 inline mr-1"></i>
+                                Mitarbeiter
+                            </label>
+                            <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-500" value="{{ current_user.username }}" readonly>
+                            <p class="mt-1 text-xs text-gray-500">Automatisch als aktueller Benutzer gesetzt</p>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Zusätzliche Informationen -->
-            <div class="form-section">
-                <div class="section-header">
-                    <div class="section-icon">
-                        <i class="fas fa-comment"></i>
+                <!-- Zusätzliche Informationen -->
+                <div class="p-6 border-b border-gray-200">
+                    <div class="flex items-center space-x-3 mb-6">
+                        <div class="w-12 h-12 bg-indigo-600 rounded-lg flex items-center justify-center">
+                            <i data-lucide="message-square" class="w-6 h-6 text-white"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-medium text-gray-900">Zusätzliche Informationen</h3>
+                            <p class="text-sm text-gray-500">Bemerkungen und Notizen (optional)</p>
+                        </div>
                     </div>
+                    
                     <div>
-                        <h3 class="section-title">Zusätzliche Informationen</h3>
-                        <p class="section-subtitle">Bemerkungen und Notizen (optional)</p>
-                    </div>
-                </div>
-                
-                <div class="field-row single">
-                    <div class="field-group">
-                        <label class="form-label">
-                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path>
-                            </svg>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i data-lucide="message-square" class="w-4 h-4 inline mr-1"></i>
                             Bemerkung
                         </label>
-                        {{ form.bemerkungen(class="form-control", rows="4", placeholder="Zusätzliche Informationen, Besonderheiten, Hinweise...") }}
+                        {{ form.bemerkungen(class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500", rows="4", placeholder="Zusätzliche Informationen, Besonderheiten, Hinweise...") }}
                         {% for error in form.bemerkungen.errors %}
-                            <div class="invalid-feedback">{{ error }}</div>
+                            <p class="mt-1 text-sm text-red-600">{{ error }}</p>
                         {% endfor %}
                     </div>
                 </div>
-            </div>
 
-            <!-- Dokumente/Bilder -->
-            <div class="form-section">
-                <div class="section-header">
-                    <div class="section-icon">
-                        <i class="fas fa-camera"></i>
+                <!-- Dokumente/Bilder -->
+                <div class="p-6 border-b border-gray-200">
+                    <div class="flex items-center space-x-3 mb-6">
+                        <div class="w-12 h-12 bg-pink-600 rounded-lg flex items-center justify-center">
+                            <i data-lucide="camera" class="w-6 h-6 text-white"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-medium text-gray-900">Dokumente & Bilder</h3>
+                            <p class="text-sm text-gray-500">Fotos und Dokumente zur Dokumentation (optional)</p>
+                        </div>
                     </div>
-                    <div>
-                        <h3 class="section-title">Dokumente & Bilder</h3>
-                        <p class="section-subtitle">Fotos und Dokumente zur Dokumentation (optional)</p>
-                    </div>
-                </div>
-                
-                <div class="file-upload-section" onclick="document.getElementById('documents').click();" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);">
-                    <div class="upload-icon">
-                        <i class="fas fa-cloud-upload-alt"></i>
-                    </div>
-                    <div class="upload-text">Dateien hochladen</div>
-                    <div class="upload-hint">Klicken Sie hier oder ziehen Sie Dateien per Drag & Drop<br>PNG, JPG, PDF bis zu 10MB</div>
-                    {{ form.documents(class="file-input", id="documents", multiple=true) }}
-                </div>
-                <div id="file-preview" class="file-preview"></div>
-            </div>
-
-            <!-- Duplikat-Warnung -->
-            <div id="duplicate-warning" class="duplicate-warning">
-                <div class="warning-header">
-                    <svg class="warning-icon" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
-                    </svg>
-                    Mögliches Duplikat gefunden!
-                </div>
-                <p class="warning-message" id="duplicate-message"></p>
-            </div>
-
-            <!-- Action Buttons -->
-            <div class="form-actions">
-                <a href="{{ url_for('dashboard.index') }}" class="btn btn-back">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 16px; height: 16px;">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-                    </svg>
-                    Zurück
-                </a>
-                
-                <div class="btn-group">
-                    <button type="button" onclick="resetForm()" class="btn btn-secondary">
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 16px; height: 16px;">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                        </svg>
-                        Zurücksetzen
-                    </button>
                     
-                    <button type="submit" class="btn btn-primary">
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 16px; height: 16px;">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>
-                        </svg>
-                        Speichern
-                    </button>
+                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-400 transition-colors cursor-pointer" 
+                         onclick="document.getElementById('documents').click();" 
+                         ondrop="dropHandler(event);" 
+                         ondragover="dragOverHandler(event);"
+                         id="file-upload-area">
+                        <div class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i data-lucide="upload-cloud" class="w-8 h-8 text-white"></i>
+                        </div>
+                        <div class="text-lg font-medium text-gray-900 mb-2">Dateien hochladen</div>
+                        <div class="text-sm text-gray-500">Klicken Sie hier oder ziehen Sie Dateien per Drag & Drop<br>PNG, JPG, PDF bis zu 10MB</div>
+                        {{ form.documents(class="hidden", id="documents", multiple=true) }}
+                    </div>
+                    <div id="file-preview" class="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4"></div>
                 </div>
-            </div>
-        </form>
+
+                <!-- Duplikat-Warnung -->
+                <div id="duplicate-warning" class="hidden mx-6 mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <div class="flex items-center">
+                        <i data-lucide="alert-triangle" class="w-5 h-5 text-yellow-600 mr-2"></i>
+                        <span class="font-medium text-yellow-800">Mögliches Duplikat gefunden!</span>
+                    </div>
+                    <p class="mt-1 text-sm text-yellow-700" id="duplicate-message"></p>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="px-6 py-4 bg-gray-50 flex items-center justify-between">
+                    <a href="{{ url_for('dashboard.index') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                        <i data-lucide="arrow-left" class="w-4 h-4 mr-2"></i>
+                        Zurück
+                    </a>
+                    
+                    <div class="flex space-x-3">
+                        <button type="button" onclick="resetForm()" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                            <i data-lucide="rotate-ccw" class="w-4 h-4 mr-2"></i>
+                            Zurücksetzen
+                        </button>
+                        
+                        <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                            <i data-lucide="save" class="w-4 h-4 mr-2"></i>
+                            Speichern
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
 
     <!-- Recent Entries -->
-    <div class="recent-entries">
-        <div class="recent-header">
-            <div class="recent-icon">
-                <i class="fas fa-history"></i>
+    <div class="px-4 py-6 sm:px-0">
+        <div class="bg-white shadow rounded-lg overflow-hidden">
+            <div class="bg-gradient-to-r from-green-500 to-blue-500 px-6 py-4">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                        <i data-lucide="clock" class="w-5 h-5 text-white"></i>
+                    </div>
+                    <h3 class="text-lg font-medium text-white">Letzte Einträge</h3>
+                </div>
             </div>
-            <h3 class="recent-title">Letzte Einträge</h3>
-        </div>
-        <div class="recent-list">
-            {% if recent_entries %}
-                {% for entry in recent_entries %}
-                    <div class="recent-item" onclick="window.location.href='{{ url_for('aufmass.details', id=entry.id) }}'">
-                        <div class="item-content">
-                            <div class="item-main">
-                                <div class="item-icon">
-                                    <i class="fas fa-ruler"></i>
+            <div class="max-h-96 overflow-y-auto">
+                {% if recent_entries %}
+                    {% for entry in recent_entries %}
+                        <div class="px-6 py-4 border-b border-gray-200 hover:bg-gray-50 cursor-pointer transition-colors" 
+                             onclick="window.location.href='/aufmass/details/{{ entry.id }}'">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
+                                        <i data-lucide="ruler" class="w-5 h-5 text-white"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-sm font-medium text-gray-900">{{ entry.material.name if entry.material else 'Unbekanntes Material' }}</h4>
+                                        <p class="text-sm text-gray-500">{{ entry.ort }} • {{ entry.menge }} {{ entry.einheit }}</p>
+                                    </div>
                                 </div>
-                                <div class="item-details">
-                                    <h4>{{ entry.material.name if entry.material else 'Unbekanntes Material' }}</h4>
-                                    <p>{{ entry.ort }} • {{ entry.menge }} {{ entry.einheit }}</p>
+                                <div class="text-right">
+                                    <div class="text-sm font-medium text-gray-900">{{ entry.datum.strftime('%d.%m.%Y') }}</div>
+                                    <div class="text-sm text-gray-500">{{ entry.mitarbeiter.username if entry.mitarbeiter else 'Unbekannt' }}</div>
                                 </div>
-                            </div>
-                            <div class="item-meta">
-                                <div class="item-date">{{ entry.datum.strftime('%d.%m.%Y') }}</div>
-                                <div class="item-user">{{ entry.mitarbeiter.username if entry.mitarbeiter else 'Unbekannt' }}</div>
                             </div>
                         </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="px-6 py-12 text-center">
+                        <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i data-lucide="clipboard-list" class="w-8 h-8 text-gray-400"></i>
+                        </div>
+                        <h3 class="text-lg font-medium text-gray-900 mb-2">Noch keine Einträge</h3>
+                        <p class="text-gray-500">Erstellen Sie Ihren ersten Aufmaß-Eintrag</p>
                     </div>
-                {% endfor %}
-            {% else %}
-                <div class="empty-state">
-                    <div class="empty-icon">
-                        <i class="fas fa-clipboard-list"></i>
-                    </div>
-                    <h3 style="margin: 0 0 0.5rem 0; color: #4a5568;">Noch keine Einträge</h3>
-                    <p style="margin: 0; color: #718096;">Erstellen Sie Ihren ersten Aufmaß-Eintrag</p>
-                </div>
-            {% endif %}
+                {% endif %}
+            </div>
         </div>
     </div>
 </div>
@@ -1056,12 +334,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Current date display
     const now = new Date();
-    document.getElementById('current-date').textContent = now.toLocaleDateString('de-DE', {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    });
+    document.getElementById('current-date').textContent = now.toLocaleDateString('de-DE');
 
     const materialSelect = document.getElementById('material_id');
     const autoEinheitField = document.getElementById('auto_einheit');
@@ -1074,7 +347,7 @@ document.addEventListener('DOMContentLoaded', function() {
     materialSelect.addEventListener('change', function() {
         const materialId = this.value;
         if (materialId && materialId > 0) {
-            fetch(`/aufmass/api/material/${materialId}`)
+            fetch('/aufmass/api/material/' + materialId)
                 .then(response => response.json())
                 .then(data => {
                     autoEinheitField.value = data.einheit || '';
@@ -1121,9 +394,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 if (data.has_duplicates) {
                     message.textContent = data.message;
-                    warning.classList.add('show');
+                    warning.classList.remove('hidden');
                 } else {
-                    warning.classList.remove('show');
+                    warning.classList.add('hidden');
                 }
             })
             .catch(error => console.error('Error:', error));
@@ -1139,32 +412,30 @@ document.addEventListener('DOMContentLoaded', function() {
         
         Array.from(e.target.files).forEach(file => {
             const div = document.createElement('div');
-            div.className = 'preview-item';
+            div.className = 'bg-white border border-gray-200 rounded-lg p-4 text-center';
             
             if (file.type.startsWith('image/')) {
                 const img = document.createElement('img');
-                img.className = 'preview-image';
+                img.className = 'w-20 h-20 object-cover rounded-lg mx-auto mb-2';
                 img.src = URL.createObjectURL(file);
                 div.appendChild(img);
-                
-                const filename = document.createElement('div');
-                filename.className = 'preview-filename';
-                filename.textContent = file.name;
-                div.appendChild(filename);
             } else {
                 const icon = document.createElement('div');
-                icon.className = 'preview-file-icon';
-                icon.innerHTML = '<i class="fas fa-file"></i>';
+                icon.className = 'w-20 h-20 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-2';
+                icon.innerHTML = '<i data-lucide="file" class="w-8 h-8 text-gray-400"></i>';
                 div.appendChild(icon);
-                
-                const filename = document.createElement('div');
-                filename.className = 'preview-filename';
-                filename.textContent = file.name;
-                div.appendChild(filename);
             }
+            
+            const filename = document.createElement('div');
+            filename.className = 'text-xs text-gray-600 truncate';
+            filename.textContent = file.name;
+            div.appendChild(filename);
             
             filePreview.appendChild(div);
         });
+        
+        // Recreate icons for new elements
+        lucide.createIcons();
     });
     
     // Form-Validierung vor Submit
@@ -1179,8 +450,8 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Loading state
         const submitBtn = form.querySelector('button[type="submit"]');
-        submitBtn.classList.add('loading');
         submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 mr-2 animate-spin"></i>Speichern...';
     });
 
     // Auto-save draft functionality
@@ -1225,8 +496,9 @@ function dropHandler(ev) {
     ev.preventDefault();
     ev.stopPropagation();
     
-    const uploadSection = ev.currentTarget;
-    uploadSection.classList.remove('dragover');
+    const uploadArea = document.getElementById('file-upload-area');
+    uploadArea.classList.remove('border-blue-400');
+    uploadArea.classList.add('border-gray-300');
     
     if (ev.dataTransfer.items) {
         const files = [];
@@ -1252,7 +524,9 @@ function dropHandler(ev) {
 function dragOverHandler(ev) {
     ev.preventDefault();
     ev.stopPropagation();
-    ev.currentTarget.classList.add('dragover');
+    const uploadArea = document.getElementById('file-upload-area');
+    uploadArea.classList.remove('border-gray-300');
+    uploadArea.classList.add('border-blue-400');
 }
 
 // Form reset function
@@ -1260,7 +534,7 @@ function resetForm() {
     if (confirm('Möchten Sie das Formular wirklich zurücksetzen? Alle Eingaben gehen verloren.')) {
         document.getElementById('aufmassForm').reset();
         document.getElementById('file-preview').innerHTML = '';
-        document.getElementById('duplicate-warning').classList.remove('show');
+        document.getElementById('duplicate-warning').classList.add('hidden');
         document.getElementById('auto_einheit').value = '';
         localStorage.removeItem('aufmass_draft');
     }

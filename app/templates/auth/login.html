@@ -2,152 +2,89 @@
 
 {% block title %}Anmelden{% endblock %}
 
-{% block body_class %}login-page{% endblock %}
-
-{% block extra_css %}
-<style>
-    .login-page {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    
-    .login-container {
-        background: white;
-        border-radius: 15px;
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-        padding: 2rem;
-        width: 100%;
-        max-width: 400px;
-        margin: 2rem;
-    }
-    
-    .logo-section {
-        text-align: center;
-        margin-bottom: 2rem;
-    }
-    
-    .logo-circle {
-        width: 80px;
-        height: 80px;
-        background: linear-gradient(135deg, #667eea, #764ba2);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 1rem;
-        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
-    }
-    
-    .form-control:focus {
-        border-color: #667eea;
-        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
-    }
-    
-    .btn-login {
-        background: linear-gradient(135deg, #667eea, #764ba2);
-        border: none;
-        padding: 12px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-    }
-    
-    .btn-login:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
-        background: linear-gradient(135deg, #5a6fd8, #6a4190);
-    }
-    
-    .input-group-text {
-        background: #f8f9fa;
-        border-right: none;
-    }
-    
-    .form-control {
-        border-left: none;
-    }
-    
-    .form-control:focus + .input-group-text,
-    .input-group-text + .form-control:focus {
-        border-color: #667eea;
-    }
-</style>
-{% endblock %}
+{% block body_class %}bg-gradient-to-br from-blue-500 to-purple-600{% endblock %}
 
 {% block content %}
-<div class="login-container">
-    <!-- Logo und Titel -->
-    <div class="logo-section">
-        <div class="logo-circle">
-            <i class="bi bi-building text-white" style="font-size: 2rem;"></i>
-        </div>
-        <h2 class="h3 mb-2 fw-bold text-dark">Willkommen zurück</h2>
-        <p class="text-muted">Melden Sie sich mit Ihren Zugangsdaten an</p>
-    </div>
-
-    <!-- Login-Formular -->
-    <form method="POST" novalidate>
-        {{ form.hidden_tag() }}
-        
-        <!-- Benutzername -->
-        <div class="mb-3">
-            {{ form.username.label(class="form-label fw-semibold") }}
-            <div class="input-group">
-                <span class="input-group-text">
-                    <i class="bi bi-person"></i>
-                </span>
-                {{ form.username(class="form-control", placeholder="Ihr Benutzername", value="admin") }}
+<div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8">
+        <div class="bg-white rounded-lg shadow-xl p-8">
+            <!-- Logo und Titel -->
+            <div class="text-center mb-8">
+                <div class="mx-auto h-20 w-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg">
+                    <i data-lucide="construction" class="w-10 h-10 text-white"></i>
+                </div>
+                <h2 class="mt-4 text-3xl font-bold text-gray-900">Willkommen zurück</h2>
+                <p class="mt-2 text-sm text-gray-600">Melden Sie sich mit Ihren Zugangsdaten an</p>
             </div>
-            {% if form.username.errors %}
-                {% for error in form.username.errors %}
-                    <div class="text-danger small mt-1">{{ error }}</div>
-                {% endfor %}
-            {% endif %}
-        </div>
 
-        <!-- Passwort -->
-        <div class="mb-3">
-            {{ form.password.label(class="form-label fw-semibold") }}
-            <div class="input-group">
-                <span class="input-group-text">
-                    <i class="bi bi-lock"></i>
-                </span>
-                {{ form.password(class="form-control", placeholder="••••••••", id="password-field") }}
-                <button type="button" class="btn btn-outline-secondary" onclick="togglePassword()">
-                    <i class="bi bi-eye" id="eye-icon"></i>
-                </button>
+            <!-- Login-Formular -->
+            <form method="POST" class="space-y-6" novalidate>
+                {{ form.hidden_tag() }}
+                
+                <!-- Benutzername -->
+                <div>
+                    {{ form.username.label(class="block text-sm font-medium text-gray-700 mb-1") }}
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i data-lucide="user" class="w-5 h-5 text-gray-400"></i>
+                        </div>
+                        {{ form.username(class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500", placeholder="Ihr Benutzername", value="admin") }}
+                    </div>
+                    {% if form.username.errors %}
+                        {% for error in form.username.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+
+                <!-- Passwort -->
+                <div>
+                    {{ form.password.label(class="block text-sm font-medium text-gray-700 mb-1") }}
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i data-lucide="lock" class="w-5 h-5 text-gray-400"></i>
+                        </div>
+                        {{ form.password(class="block w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500", placeholder="••••••••", id="password-field") }}
+                        <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center" onclick="togglePassword()">
+                            <i data-lucide="eye" id="eye-icon" class="w-5 h-5 text-gray-400 hover:text-gray-600"></i>
+                        </button>
+                    </div>
+                    {% if form.password.errors %}
+                        {% for error in form.password.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+
+                <!-- Optionen -->
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        {{ form.remember_me(class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded") }}
+                        {{ form.remember_me.label(class="ml-2 block text-sm text-gray-900") }}
+                    </div>
+                    <div class="text-sm">
+                        <a href="#" class="font-medium text-blue-600 hover:text-blue-500">
+                            Passwort vergessen?
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Login-Button -->
+                {{ form.submit(class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 transform hover:-translate-y-0.5") }}
+            </form>
+
+            <!-- Admin-Hinweis -->
+            <div class="mt-6 pt-6 border-t border-gray-200">
+                <p class="text-center text-sm text-gray-600">
+                    Noch kein Account? <span class="font-medium text-gray-900">Bitte kontaktieren Sie den Administrator</span>
+                </p>
             </div>
-            {% if form.password.errors %}
-                {% for error in form.password.errors %}
-                    <div class="text-danger small mt-1">{{ error }}</div>
-                {% endfor %}
-            {% endif %}
         </div>
-
-        <!-- Optionen -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <div class="form-check">
-                {{ form.remember_me(class="form-check-input") }}
-                {{ form.remember_me.label(class="form-check-label") }}
-            </div>
-            <a href="#" class="text-decoration-none small">
-                Passwort vergessen?
-            </a>
-        </div>
-
-        <!-- Login-Button -->
-        {{ form.submit(class="btn btn-login btn-primary w-100 text-white") }}
-    </form>
-
-    <!-- Admin-Hinweis -->
-    <div class="text-center mt-4 pt-3 border-top">
-        <p class="text-muted small mb-0">
-            Noch kein Account? <strong>Bitte kontaktieren Sie den Administrator</strong>
-        </p>
     </div>
 </div>
+
+<!-- Toast Container -->
+<div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
 {% endblock %}
 
 {% block extra_js %}
@@ -158,10 +95,72 @@ function togglePassword() {
     
     if (input.type === 'password') {
         input.type = 'text';
-        icon.className = 'bi bi-eye-slash';
+        icon.setAttribute('data-lucide', 'eye-off');
     } else {
         input.type = 'password';
-        icon.className = 'bi bi-eye';
+        icon.setAttribute('data-lucide', 'eye');
+    }
+    lucide.createIcons();
+}
+
+function showToast(message, type = 'error') {
+    const toastContainer = document.getElementById('toast-container');
+    const toastId = 'toast-' + Date.now();
+    
+    const iconMap = {
+        error: 'alert-circle',
+        success: 'check-circle',
+        warning: 'alert-triangle',
+        info: 'info'
+    };
+    
+    const colorMap = {
+        error: 'bg-red-50 text-red-700 border-red-200',
+        success: 'bg-green-50 text-green-700 border-green-200',
+        warning: 'bg-yellow-50 text-yellow-700 border-yellow-200',
+        info: 'bg-blue-50 text-blue-700 border-blue-200'
+    };
+    
+    const toastHtml = `
+        <div id="${toastId}" class="max-w-sm w-full ${colorMap[type]} border rounded-lg shadow-lg p-4 transform transition-all duration-300 translate-x-full opacity-0">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <i data-lucide="${iconMap[type]}" class="w-5 h-5"></i>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm font-medium">${message}</p>
+                </div>
+                <div class="ml-auto pl-3">
+                    <button onclick="removeToast('${toastId}')" class="inline-flex text-gray-400 hover:text-gray-600">
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+    const toast = document.getElementById(toastId);
+    
+    // Trigger reflow and animate in
+    setTimeout(() => {
+        toast.classList.remove('translate-x-full', 'opacity-0');
+        lucide.createIcons();
+    }, 10);
+    
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+        removeToast(toastId);
+    }, 5000);
+}
+
+function removeToast(toastId) {
+    const toast = document.getElementById(toastId);
+    if (toast) {
+        toast.classList.add('translate-x-full', 'opacity-0');
+        setTimeout(() => {
+            toast.remove();
+        }, 300);
     }
 }
 
@@ -172,31 +171,7 @@ document.querySelector('form').addEventListener('submit', function(e) {
     
     if (!username.trim() || !password.trim()) {
         e.preventDefault();
-        
-        // Bootstrap Toast für Fehlermeldung
-        const toastHtml = `
-            <div class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
-                <div class="d-flex">
-                    <div class="toast-body">
-                        <i class="bi bi-exclamation-triangle me-2"></i>
-                        Bitte füllen Sie alle Felder aus.
-                    </div>
-                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-                </div>
-            </div>
-        `;
-        
-        // Toast Container erstellen falls nicht vorhanden
-        let toastContainer = document.querySelector('.toast-container');
-        if (!toastContainer) {
-            toastContainer = document.createElement('div');
-            toastContainer.className = 'toast-container position-fixed top-0 end-0 p-3';
-            document.body.appendChild(toastContainer);
-        }
-        
-        toastContainer.insertAdjacentHTML('beforeend', toastHtml);
-        const toast = new bootstrap.Toast(toastContainer.lastElementChild);
-        toast.show();
+        showToast('Bitte füllen Sie alle Felder aus.', 'error');
     }
 });
 

@@ -703,20 +703,18 @@ function showSuggestions(input, suggestions) {
 function updateMaterialInfo(materialId) {
     if (!materialId) return;
     
-    fetch(`/api/material/${materialId}`)
+    fetch(`/aufmass/api/material/${materialId}`)
         .then(response => response.json())
         .then(data => {
-            if (data.success) {
-                // Update material info display
-                const infoDiv = document.querySelector('#material-info');
-                if (infoDiv && data.material) {
-                    infoDiv.innerHTML = `
-                        <small class="text-muted">
-                            ${data.material.description || ''}
-                            ${data.material.unit ? ` (Einheit: ${data.material.unit})` : ''}
-                        </small>
-                    `;
-                }
+            // Update material info display
+            const infoDiv = document.querySelector('#material-info');
+            if (infoDiv && data) {
+                infoDiv.innerHTML = `
+                    <small class="text-muted">
+                        ${data.kategorie || ''}
+                        ${data.einheit ? ` (Einheit: ${data.einheit})` : ''}
+                    </small>
+                `;
             }
         })
         .catch(error => console.error('Material info error:', error));

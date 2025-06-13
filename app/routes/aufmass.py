@@ -3,7 +3,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 from sqlalchemy import or_, and_
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import uuid
 
 from app import db
@@ -165,7 +165,7 @@ def bearbeiten(id):
     if form.validate_on_submit():
         try:
             form.populate_obj(aufmass)
-            aufmass.updated_at = datetime.utcnow()
+            aufmass.updated_at = datetime.now(timezone.utc)
 
             eintrag = BautagebuchEntry.query.filter_by(aufmass_entry_id=id).first()
             if eintrag:

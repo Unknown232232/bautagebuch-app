@@ -3,7 +3,7 @@ from flask_wtf.file import FileField, FileAllowed
 from wtforms import SelectField, StringField, FloatField, DateTimeField, TextAreaField, SubmitField, FieldList
 from wtforms.validators import DataRequired, NumberRange, Length, Optional
 from wtforms.widgets import TextInput
-from datetime import datetime
+from datetime import datetime, timezone
 from app.models.material import Material  # Fixed import path
 
 
@@ -54,7 +54,7 @@ class AufmassForm(FlaskForm):
     datum = DateTimeField(
         'Wann? (Datum)',
         validators=[DataRequired(message='Bitte geben Sie ein Datum an.')],
-        default=datetime.now,
+        default=lambda: datetime.now(timezone.utc),
         format='%Y-%m-%d',
         render_kw={'class': 'form-control', 'type': 'date'}
     )

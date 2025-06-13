@@ -2,7 +2,7 @@
 Authentifizierungs-Routen
 """
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from flask import Blueprint, render_template, redirect, url_for, flash, request, session, current_app
 from flask_login import login_user, logout_user, current_user, login_required
 from flask_limiter import Limiter
@@ -27,7 +27,7 @@ def is_account_locked(username):
     attempts, last_attempt = failed_attempts[username]
     
     # Reset after 15 minutes
-    if datetime.now() - last_attempt > timedelta(minutes=15):
+    if datetime.now(timezone.utc) - last_attempt > timedelta(minutes=15):
         del failed_attempts[username]
         return False
     
@@ -36,7 +36,7 @@ def is_account_locked(username):
 
 def record_failed_attempt(username):
     """Record a failed login attempt."""
-    now = datetime.now()
+    now = datetime.now(timezone.utc)
     if username in failed_attempts:
         attempts, _ = failed_attempts[username]
         failed_attempts[username] = (attempts + 1, now)

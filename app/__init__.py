@@ -68,8 +68,8 @@ def create_app(config_name=None):
             'strict_transport_security': True,
             'content_security_policy': {
                 'default-src': "'self'",
-                'script-src': "'self' 'unsafe-inline' cdn.jsdelivr.net",
-                'style-src': "'self' 'unsafe-inline' cdn.jsdelivr.net fonts.googleapis.com",
+                'script-src': "'self' 'unsafe-inline' cdn.tailwindcss.com unpkg.com",
+                'style-src': "'self' 'unsafe-inline' fonts.googleapis.com",
                 'font-src': "'self' fonts.gstatic.com",
                 'img-src': "'self' data:",
                 'connect-src': "'self'"
@@ -90,6 +90,15 @@ def create_app(config_name=None):
     def load_user(user_id):
         from .models.user import User
         return User.query.get(int(user_id))
+
+    # Import models to ensure they are registered with SQLAlchemy
+    from .models import user, aufmass, bautagebuch, material, kabel_kategorie
+
+    # Template context processors
+    @app.context_processor
+    def inject_csrf_token():
+        from flask_wtf.csrf import generate_csrf
+        return dict(csrf_token=generate_csrf)
 
     # Error handlers
     @app.errorhandler(404)
@@ -155,6 +164,10 @@ def create_app(config_name=None):
     # API Blueprint for AJAX endpoints
     from .routes.api import api_bp
     app.register_blueprint(api_bp, url_prefix='/api')
+
+    # Kabel Blueprint for cable category management
+    from .routes.kabel import kabel_bp
+    app.register_blueprint(kabel_bp, url_prefix='/kabel')
 
     # Root route - redirect to login or dashboard
     @app.route('/')

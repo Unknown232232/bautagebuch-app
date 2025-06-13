@@ -35,6 +35,10 @@ class User(UserMixin, db.Model):
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     last_login = db.Column(db.DateTime)
     updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
+    
+    # Passwort-Management
+    password_change_required = db.Column(db.Boolean, default=True)  # Erster Login erfordert Passwort-Änderung
+    password_changed_at = db.Column(db.DateTime)
 
     # Beziehungen (konsistent mit den anderen Modellen)
     aufmass_entries = db.relationship('AufmassEntry', back_populates='mitarbeiter', foreign_keys='AufmassEntry.mitarbeiter_id')
@@ -43,10 +47,16 @@ class User(UserMixin, db.Model):
     def set_password(self, password):
         """Passwort hashen und speichern."""
         self.password_hash = generate_password_hash(password)
+        self.password_changed_at = datetime.now(timezone.utc)
+        self.password_change_required = False
 
     def check_password(self, password):
         """Passwort gegen Hash prüfen."""
         return check_password_hash(self.password_hash, password)
+    
+    def requires_password_change(self):
+        """Prüft ob Benutzer sein Passwort ändern muss."""
+        return self.password_change_required
 
     # --- Rollenprüfungen ---
     def has_role(self, required_role):

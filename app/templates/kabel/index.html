@@ -1,0 +1,266 @@
+{% extends "base.html" %}
+
+{% block title %}Kabel-Kategorien{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0">
+                    <i class="fas fa-plug me-2"></i>
+                    Kabel-Kategorien
+                </h1>
+                
+                {% if current_user.is_admin() %}
+                <div class="btn-group" role="group">
+                    <a href="{{ url_for('kabel.neue_kategorie') }}" class="btn btn-success">
+                        <i class="fas fa-plus me-1"></i>
+                        Neue Kategorie
+                    </a>
+                    <a href="{{ url_for('kabel.neuer_kabeltyp') }}" class="btn btn-primary">
+                        <i class="fas fa-plus me-1"></i>
+                        Neuer Kabeltyp
+                    </a>
+                    <a href="{{ url_for('kabel.bulk_import') }}" class="btn btn-info">
+                        <i class="fas fa-upload me-1"></i>
+                        Bulk Import
+                    </a>
+                    <a href="{{ url_for('kabel.kategorien') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-cog me-1"></i>
+                        Verwaltung
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Such- und Filterbereich -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form method="GET" class="row g-3">
+                        <div class="col-md-6">
+                            {{ search_form.search.label(class="form-label") }}
+                            {{ search_form.search(value=search_query) }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ search_form.kategorie.label(class="form-label") }}
+                            {{ search_form.kategorie(value=kategorie_filter) }}
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            {{ search_form.submit() }}
+                            {% if search_query or kategorie_filter %}
+                            <a href="{{ url_for('kabel.index') }}" class="btn btn-outline-secondary ms-2">
+                                <i class="fas fa-times"></i>
+                            </a>
+                            {% endif %}
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Quick Add Bereich (nur für Admins) -->
+            {% if current_user.is_admin() %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-bolt me-2"></i>
+                        Schnell hinzufügen
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form id="quickAddForm" class="row g-3">
+                        <div class="col-md-4">
+                            <label for="quickKategorie" class="form-label">Kategorie</label>
+                            <input type="text" class="form-control" id="quickKategorie" placeholder="z.B. BMA, ELA" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="quickKabeltyp" class="form-label">Kabeltyp</label>
+                            <input type="text" class="form-control" id="quickKabeltyp" placeholder="z.B. Alu Rohr" required>
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button type="submit" class="btn btn-success w-100">
+                                <i class="fas fa-plus me-1"></i>
+                                Hinzufügen
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Ergebnisse -->
+            {% if kategorien_data %}
+                {% if search_query %}
+                <div class="alert alert-info">
+                    <i class="fas fa-search me-2"></i>
+                    Suchergebnisse für "<strong>{{ search_query }}</strong>": 
+                    {{ kategorien_data|length }} Kategorie(n) gefunden
+                </div>
+                {% endif %}
+
+                <div class="row">
+                    {% for kategorie_name, kabeltypen in kategorien_data.items() %}
+                    <div class="col-lg-6 col-xl-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-folder me-2 text-primary"></i>
+                                    {{ kategorie_name }}
+                                </h5>
+                                <span class="badge bg-secondary">{{ kabeltypen|length }}</span>
+                            </div>
+                            <div class="card-body">
+                                <div class="list-group list-group-flush">
+                                    {% for kabeltyp in kabeltypen %}
+                                    <div class="list-group-item d-flex justify-content-between align-items-start px-0 border-0">
+                                        <div class="flex-grow-1">
+                                            <div class="fw-bold">{{ kabeltyp.name }}</div>
+                                            {% if kabeltyp.beschreibung %}
+                                            <small class="text-muted">{{ kabeltyp.beschreibung[:100] }}{% if kabeltyp.beschreibung|length > 100 %}...{% endif %}</small>
+                                            {% endif %}
+                                        </div>
+                                        {% if current_user.is_admin() %}
+                                        <div class="btn-group btn-group-sm ms-2" role="group">
+                                            <a href="{{ url_for('kabel.kabeltyp_bearbeiten', kabeltyp_id=kabeltyp.id) }}" 
+                                               class="btn btn-outline-primary btn-sm" title="Bearbeiten">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <small class="text-muted">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    {{ kabeltypen|length }} Kabeltyp(en) in dieser Kategorie
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-plug fa-3x text-muted mb-3"></i>
+                    <h4 class="text-muted">Keine Kabeltypen gefunden</h4>
+                    {% if search_query %}
+                    <p class="text-muted">
+                        Keine Ergebnisse für "{{ search_query }}" gefunden.
+                        <a href="{{ url_for('kabel.index') }}">Alle anzeigen</a>
+                    </p>
+                    {% else %}
+                    <p class="text-muted">
+                        Noch keine Kabel-Kategorien vorhanden.
+                        {% if current_user.is_admin() %}
+                        <a href="{{ url_for('kabel.neue_kategorie') }}">Erste Kategorie erstellen</a>
+                        {% endif %}
+                    </p>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Kabel-API JavaScript -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Quick Add Funktionalität
+    const quickAddForm = document.getElementById('quickAddForm');
+    if (quickAddForm) {
+        quickAddForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const kategorie = document.getElementById('quickKategorie').value.trim();
+            const kabeltyp = document.getElementById('quickKabeltyp').value.trim();
+            
+            if (!kategorie || !kabeltyp) {
+                alert('Bitte füllen Sie alle Felder aus.');
+                return;
+            }
+            
+            // AJAX Request
+            fetch('{{ url_for("kabel.api_quick_add") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({
+                    kategorie_name: kategorie,
+                    kabeltyp_name: kabeltyp
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Erfolgsmeldung anzeigen
+                    showAlert('Kabeltyp erfolgreich hinzugefügt!', 'success');
+                    
+                    // Formular zurücksetzen
+                    quickAddForm.reset();
+                    
+                    // Seite nach kurzer Verzögerung neu laden
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
+                } else {
+                    showAlert(data.error || 'Fehler beim Hinzufügen', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlert('Netzwerkfehler beim Hinzufügen', 'error');
+            });
+        });
+    }
+    
+    // Hilfsfunktion für Alerts
+    function showAlert(message, type) {
+        const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+        const alertHtml = `
+            <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
+                <i class="fas fa-${type === 'success' ? 'check' : 'exclamation-triangle'} me-2"></i>
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        `;
+        
+        // Alert am Anfang der Seite einfügen
+        const container = document.querySelector('.container-fluid');
+        container.insertAdjacentHTML('afterbegin', alertHtml);
+        
+        // Alert nach 5 Sekunden automatisch ausblenden
+        setTimeout(() => {
+            const alert = container.querySelector('.alert');
+            if (alert) {
+                alert.remove();
+            }
+        }, 5000);
+    }
+});
+
+// Kabel-API Funktionen für andere Seiten
+window.KabelAPI = {
+    // Kabeltypen einer Kategorie abrufen
+    getKabeltypenByKategorie: function(kategorieName) {
+        return fetch(`{{ url_for('kabel.api_kabeltypen_by_kategorie', kategorie_name='KATEGORIE_NAME') }}`.replace('KATEGORIE_NAME', encodeURIComponent(kategorieName)))
+            .then(response => response.json());
+    },
+    
+    // Alle Kategorien abrufen
+    getAllKategorien: function() {
+        return fetch('{{ url_for("kabel.api_kategorien") }}')
+            .then(response => response.json());
+    },
+    
+    // Kabeltypen suchen
+    searchKabeltypen: function(suchbegriff) {
+        return fetch(`{{ url_for('kabel.api_search') }}?q=${encodeURIComponent(suchbegriff)}`)
+            .then(response => response.json());
+    }
+};
+</script>
+{% endblock %}

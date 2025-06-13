@@ -89,8 +89,8 @@ class AufmassForm(FlaskForm):
         super(AufmassForm, self).__init__(*args, **kwargs)
         # Dropdown mit aktiven Materialien füllen
         self.material_id.choices = [
-            (material.id, f"{material.name} ({material.einheit or 'Stk'})")
-            for material in Material.query.filter_by(ist_aktiv=True).order_by(Material.name).all()
+            (material.id, f"{material.name} ({material.unit or 'Stk'})")
+            for material in Material.query.filter_by(is_active=True).order_by(Material.name).all()
         ]
         self.material_id.choices.insert(0, (0, '-- Bitte wählen --'))
 
@@ -166,5 +166,5 @@ class SearchFilterForm(FlaskForm):
         self.material_filter.choices = [(0, 'Alle Materialien')]
         self.material_filter.choices.extend([
             (material.id, material.name)
-            for material in Material.query.filter_by(ist_aktiv=True).order_by(Material.name).all()
+            for material in Material.query.filter_by(is_active=True).order_by(Material.name).all()
         ])

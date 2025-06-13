@@ -31,6 +31,11 @@ def login():
             login_user(user, remember=form.remember_me.data)
             user.update_last_login()
             
+            # Prüfen ob Passwort geändert werden muss
+            if user.requires_password_change():
+                flash('Sie müssen Ihr Passwort beim ersten Login ändern.', 'warning')
+                return redirect(url_for('auth.change_password'))
+            
             # Redirect to intended page or dashboard
             next_page = request.args.get('next')
             if not next_page or urlparse(next_page).netloc != '':

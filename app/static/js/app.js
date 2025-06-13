@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function initializeApp() {
-    createLoadingOverlay();
+    // createLoadingOverlay(); // Disabled to fix loading issue
     createToastContainer();
     initializeFormValidation();
     initializeTableSorting();
@@ -26,15 +26,8 @@ function initializeApp() {
 
 // ===== LOADING SYSTEM =====
 function createLoadingOverlay() {
-    loadingOverlay = document.createElement('div');
-    loadingOverlay.className = 'loading-overlay d-none';
-    loadingOverlay.innerHTML = `
-        <div class="text-center">
-            <div class="loading-spinner dark mb-3"></div>
-            <p class="text-secondary">Lädt...</p>
-        </div>
-    `;
-    document.body.appendChild(loadingOverlay);
+    // Disabled - was causing permanent loading screen
+    return;
 }
 
 function showLoading(message = 'Lädt...') {

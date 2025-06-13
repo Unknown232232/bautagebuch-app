@@ -130,9 +130,9 @@ class MaterialSearchForm(FlaskForm):
         super(MaterialSearchForm, self).__init__(*args, **kwargs)
         
         # Kategorien für Filter laden
-        kategorien = Material.query.with_entities(Material.kategorie).distinct().filter(
-            Material.kategorie.isnot(None)
-        ).order_by(Material.kategorie).all()
+        kategorien = Material.query.with_entities(Material.category).distinct().filter(
+            Material.category.isnot(None)
+        ).order_by(Material.category).all()
         
         self.category.choices = [('', 'Alle Kategorien')]
-        self.category.choices.extend([(k.kategorie, k.kategorie) for k in kategorien if k.kategorie])
+        self.category.choices.extend([(k.category, k.category) for k in kategorien if k.category])

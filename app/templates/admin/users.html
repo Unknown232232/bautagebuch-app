@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block title %}Benutzerverwaltung{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-header">
+                <h1 class="page-title">
+                    <i class="fas fa-users"></i> Benutzerverwaltung
+                </h1>
+                <div class="page-actions">
+                    <a href="{{ url_for('admin.add_user') }}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Benutzer hinzufügen
+                    </a>
+                    <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Zurück
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Alle Benutzer ({{ users|length }})</h5>
+                </div>
+                <div class="card-body">
+                    {% if users %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Benutzername</th>
+                                    <th>Name</th>
+                                    <th>E-Mail</th>
+                                    <th>Rolle</th>
+                                    <th>Status</th>
+                                    <th>Letzter Login</th>
+                                    <th>Passwort ändern</th>
+                                    <th>Aktionen</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in users %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ user.username }}</strong>
+                                        {% if user.id == current_user.id %}
+                                        <span class="badge bg-info ms-1">Sie</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ user.get_full_name() }}</td>
+                                    <td>{{ user.email }}</td>
+                                    <td>
+                                        {% if user.role == 'admin' %}
+                                        <span class="badge bg-danger">Administrator</span>
+                                        {% elif user.role == 'bauleiter' %}
+                                        <span class="badge bg-warning">Bauleiter</span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">Mitarbeiter</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if user.is_active %}
+                                        <span class="badge bg-success">Aktiv</span>
+                                        {% else %}
+                                        <span class="badge bg-danger">Inaktiv</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if user.last_login %}
+                                        {{ user.last_login.strftime('%d.%m.%Y %H:%M') }}
+                                        {% else %}
+                                        <span class="text-muted">Nie</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if user.requires_password_change() %}
+                                        <span class="badge bg-warning">Erforderlich</span>
+                                        {% else %}
+                                        <span class="badge bg-success">Geändert</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a href="{{ url_for('admin.edit_user', id=user.id) }}" 
+                                               class="btn btn-sm btn-outline-primary" title="Bearbeiten">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            
+                                            {% if user.id != current_user.id %}
+                                            <form method="POST" action="{{ url_for('admin.toggle_user_status', id=user.id) }}" 
+                                                  style="display: inline;">
+                                                <button type="submit" 
+                                                        class="btn btn-sm btn-outline-{% if user.is_active %}warning{% else %}success{% endif %}"
+                                                        title="{% if user.is_active %}Deaktivieren{% else %}Aktivieren{% endif %}"
+                                                        onclick="return confirm('Benutzer {% if user.is_active %}deaktivieren{% else %}aktivieren{% endif %}?')">
+                                                    <i class="fas fa-{% if user.is_active %}pause{% else %}play{% endif %}"></i>
+                                                </button>
+                                            </form>
+                                            {% endif %}
+                                            
+                                            <form method="POST" action="{{ url_for('admin.reset_user_password', id=user.id) }}" 
+                                                  style="display: inline;">
+                                                <button type="submit" 
+                                                        class="btn btn-sm btn-outline-info"
+                                                        title="Passwort zurücksetzen"
+                                                        onclick="return confirm('Passwort für {{ user.username }} zurücksetzen?')">
+                                                    <i class="fas fa-key"></i>
+                                                </button>
+                                            </form>
+                                            
+                                            {% if user.id != current_user.id %}
+                                            <form method="POST" action="{{ url_for('admin.delete_user', id=user.id) }}" 
+                                                  style="display: inline;">
+                                                <button type="submit" 
+                                                        class="btn btn-sm btn-outline-danger"
+                                                        title="Löschen"
+                                                        onclick="return confirm('Benutzer {{ user.username }} wirklich löschen?')">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">Keine Benutzer gefunden.</p>
+                        <a href="{{ url_for('admin.add_user') }}" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Ersten Benutzer hinzufügen
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

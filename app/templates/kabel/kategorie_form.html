@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0">
+                    <i class="fas fa-folder me-2"></i>
+                    {{ title }}
+                </h1>
+                
+                <a href="{{ url_for('kabel.kategorien') }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-1"></i>
+                    Zurück zur Verwaltung
+                </a>
+            </div>
+
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-edit me-2"></i>
+                                Kategorie-Details
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="POST">
+                                {{ form.hidden_tag() }}
+                                
+                                <div class="mb-3">
+                                    {{ form.name.label(class="form-label") }}
+                                    {{ form.name() }}
+                                    {% if form.name.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.name.errors %}
+                                                <div>{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                    <div class="form-text">
+                                        Eindeutiger Name für die Kabel-Kategorie (z.B. BMA, ELA, Netzwerk)
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    {{ form.beschreibung.label(class="form-label") }}
+                                    {{ form.beschreibung() }}
+                                    {% if form.beschreibung.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.beschreibung.errors %}
+                                                <div>{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                    <div class="form-text">
+                                        Optionale Beschreibung der Kategorie
+                                    </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <div class="form-check">
+                                        {{ form.ist_aktiv() }}
+                                        {{ form.ist_aktiv.label(class="form-check-label") }}
+                                    </div>
+                                    <div class="form-text">
+                                        Nur aktive Kategorien werden in der Übersicht angezeigt
+                                    </div>
+                                </div>
+
+                                <div class="d-flex justify-content-between">
+                                    <a href="{{ url_for('kabel.kategorien') }}" class="btn btn-secondary">
+                                        <i class="fas fa-times me-1"></i>
+                                        Abbrechen
+                                    </a>
+                                    {{ form.submit() }}
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    {% if kategorie %}
+                    <div class="card mt-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Kategorie-Informationen
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <strong>Erstellt:</strong><br>
+                                    <small class="text-muted">
+                                        {{ kategorie.created_at.strftime('%d.%m.%Y %H:%M') if kategorie.created_at else 'Unbekannt' }}
+                                    </small>
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Zuletzt geändert:</strong><br>
+                                    <small class="text-muted">
+                                        {{ kategorie.updated_at.strftime('%d.%m.%Y %H:%M') if kategorie.updated_at else 'Nie' }}
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="row mt-3">
+                                <div class="col-md-6">
+                                    <strong>Anzahl Kabeltypen:</strong><br>
+                                    <span class="badge bg-info">{{ kategorie.kabeltypen.count() }}</span>
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Status:</strong><br>
+                                    {% if kategorie.ist_aktiv %}
+                                        <span class="badge bg-success">Aktiv</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Inaktiv</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

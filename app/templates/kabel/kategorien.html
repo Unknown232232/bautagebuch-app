@@ -1,0 +1,236 @@
+{% extends "base.html" %}
+
+{% block title %}Kabel-Kategorien Verwaltung{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0">
+                    <i class="fas fa-cog me-2"></i>
+                    Kabel-Kategorien Verwaltung
+                </h1>
+                
+                <div class="btn-group" role="group">
+                    <a href="{{ url_for('kabel.index') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>
+                        Zurück zur Übersicht
+                    </a>
+                    <a href="{{ url_for('kabel.neue_kategorie') }}" class="btn btn-success">
+                        <i class="fas fa-plus me-1"></i>
+                        Neue Kategorie
+                    </a>
+                </div>
+            </div>
+
+            {% if kategorien %}
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-list me-2"></i>
+                        Alle Kategorien ({{ kategorien|length }})
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Beschreibung</th>
+                                    <th>Kabeltypen</th>
+                                    <th>Status</th>
+                                    <th>Erstellt</th>
+                                    <th width="150">Aktionen</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for kategorie in kategorien %}
+                                <tr class="{% if not kategorie.ist_aktiv %}table-secondary{% endif %}">
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-folder me-2 text-primary"></i>
+                                            <strong>{{ kategorie.name }}</strong>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {% if kategorie.beschreibung %}
+                                            {{ kategorie.beschreibung[:100] }}
+                                            {% if kategorie.beschreibung|length > 100 %}...{% endif %}
+                                        {% else %}
+                                            <span class="text-muted">Keine Beschreibung</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info">
+                                            {{ kategorie.kabeltypen.count() }} Kabeltypen
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if kategorie.ist_aktiv %}
+                                            <span class="badge bg-success">Aktiv</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Inaktiv</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <small class="text-muted">
+                                            {{ kategorie.created_at.strftime('%d.%m.%Y') if kategorie.created_at else '-' }}
+                                        </small>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <a href="{{ url_for('kabel.kategorie_bearbeiten', kategorie_id=kategorie.id) }}" 
+                                               class="btn btn-outline-primary" title="Bearbeiten">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <button type="button" 
+                                                    class="btn btn-outline-info" 
+                                                    title="Kabeltypen anzeigen"
+                                                    onclick="showKabeltypen({{ kategorie.id }}, '{{ kategorie.name }}')">
+                                                <i class="fas fa-list"></i>
+                                            </button>
+                                            {% if kategorie.ist_aktiv %}
+                                            <button type="button" 
+                                                    class="btn btn-outline-warning" 
+                                                    title="Deaktivieren"
+                                                    onclick="toggleKategorie({{ kategorie.id }}, false)">
+                                                <i class="fas fa-pause"></i>
+                                            </button>
+                                            {% else %}
+                                            <button type="button" 
+                                                    class="btn btn-outline-success" 
+                                                    title="Aktivieren"
+                                                    onclick="toggleKategorie({{ kategorie.id }}, true)">
+                                                <i class="fas fa-play"></i>
+                                            </button>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-folder-open fa-3x text-muted mb-3"></i>
+                <h4 class="text-muted">Keine Kategorien vorhanden</h4>
+                <p class="text-muted">
+                    Erstellen Sie die erste Kabel-Kategorie.
+                </p>
+                <a href="{{ url_for('kabel.neue_kategorie') }}" class="btn btn-success">
+                    <i class="fas fa-plus me-1"></i>
+                    Erste Kategorie erstellen
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Modal für Kabeltypen-Anzeige -->
+<div class="modal fade" id="kabeltypModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-list me-2"></i>
+                    Kabeltypen in <span id="modalKategorieName"></span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="kabeltypListe">
+                    <div class="text-center">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">Lädt...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Schließen</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Kabeltypen einer Kategorie anzeigen
+function showKabeltypen(kategorieId, kategorieName) {
+    document.getElementById('modalKategorieName').textContent = kategorieName;
+    
+    const modal = new bootstrap.Modal(document.getElementById('kabeltypModal'));
+    modal.show();
+    
+    // Kabeltypen laden
+    const apiUrl = '{{ url_for("kabel.api_kabeltypen_by_kategorie", kategorie_name="PLACEHOLDER") }}'.replace('PLACEHOLDER', encodeURIComponent(kategorieName));
+    
+    fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+            const container = document.getElementById('kabeltypListe');
+            
+            if (data.success && data.kabeltypen.length > 0) {
+                let html = '<div class="list-group">';
+                
+                data.kabeltypen.forEach(kabeltyp => {
+                    html += '<div class="list-group-item">';
+                    html += '<div class="d-flex justify-content-between align-items-start">';
+                    html += '<div class="flex-grow-1">';
+                    html += '<h6 class="mb-1">' + kabeltyp.name + '</h6>';
+                    if (kabeltyp.beschreibung) {
+                        html += '<p class="mb-1 text-muted">' + kabeltyp.beschreibung + '</p>';
+                    }
+                    if (kabeltyp.technische_daten) {
+                        html += '<small class="text-info">Technische Daten: ' + kabeltyp.technische_daten + '</small>';
+                    }
+                    html += '</div>';
+                    html += '<div class="btn-group btn-group-sm">';
+                    html += '<a href="/kabel/kabeltyp/' + kabeltyp.id + '/bearbeiten" class="btn btn-outline-primary btn-sm">';
+                    html += '<i class="fas fa-edit"></i>';
+                    html += '</a>';
+                    html += '</div>';
+                    html += '</div>';
+                    html += '</div>';
+                });
+                
+                html += '</div>';
+                container.innerHTML = html;
+            } else {
+                container.innerHTML = '<div class="text-center text-muted">' +
+                    '<i class="fas fa-info-circle fa-2x mb-2"></i>' +
+                    '<p>Keine Kabeltypen in dieser Kategorie vorhanden.</p>' +
+                    '<a href="{{ url_for("kabel.neuer_kabeltyp") }}" class="btn btn-primary btn-sm">' +
+                    '<i class="fas fa-plus me-1"></i>Ersten Kabeltyp hinzufügen</a>' +
+                    '</div>';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById('kabeltypListe').innerHTML = 
+                '<div class="alert alert-danger">' +
+                '<i class="fas fa-exclamation-triangle me-2"></i>' +
+                'Fehler beim Laden der Kabeltypen.' +
+                '</div>';
+        });
+}
+
+// Kategorie aktivieren/deaktivieren
+function toggleKategorie(kategorieId, activate) {
+    const action = activate ? 'aktivieren' : 'deaktivieren';
+    
+    if (!confirm('Möchten Sie diese Kategorie wirklich ' + action + '?')) {
+        return;
+    }
+    
+    // Hier würde normalerweise ein AJAX-Request zum Aktivieren/Deaktivieren stehen
+    // Für jetzt einfach die Seite neu laden
+    alert('Kategorie würde ' + (activate ? 'aktiviert' : 'deaktiviert') + ' werden. (Funktion noch nicht implementiert)');
+}
+</script>
+{% endblock %}

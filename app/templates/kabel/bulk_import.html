@@ -1,0 +1,207 @@
+{% extends "base.html" %}
+
+{% block title %}Kabeltypen Bulk-Import{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0">
+                    <i class="fas fa-upload me-2"></i>
+                    Kabeltypen Bulk-Import
+                </h1>
+                
+                <a href="{{ url_for('kabel.index') }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-1"></i>
+                    Zurück zur Übersicht
+                </a>
+            </div>
+
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <!-- Anleitung -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Anleitung
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="mb-3">
+                                Mit dem Bulk-Import können Sie mehrere Kabeltypen gleichzeitig zu einer Kategorie hinzufügen.
+                            </p>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6>Format:</h6>
+                                    <ul class="mb-0">
+                                        <li>Ein Kabeltyp pro Zeile</li>
+                                        <li>Nur der Name des Kabeltyps</li>
+                                        <li>Leere Zeilen werden ignoriert</li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6>Beispiel:</h6>
+                                    <div class="bg-light p-2 rounded">
+                                        <code>
+                                            Alu Rohr<br>
+                                            2x2x0,8 E30 Kabel<br>
+                                            2x2x0,8 Kabel rot<br>
+                                            4x2x0,6 Grau
+                                        </code>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Import-Formular -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-edit me-2"></i>
+                                Import-Daten
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="POST">
+                                {{ form.hidden_tag() }}
+                                
+                                <div class="mb-3">
+                                    {{ form.kategorie_id.label(class="form-label") }}
+                                    {{ form.kategorie_id() }}
+                                    {% if form.kategorie_id.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.kategorie_id.errors %}
+                                                <div>{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                    <div class="form-text">
+                                        Wählen Sie die Ziel-Kategorie für alle Kabeltypen
+                                    </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    {{ form.kabeltypen_text.label(class="form-label") }}
+                                    {{ form.kabeltypen_text() }}
+                                    {% if form.kabeltypen_text.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.kabeltypen_text.errors %}
+                                                <div>{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                    <div class="form-text">
+                                        Geben Sie die Kabeltypen ein - einen pro Zeile
+                                    </div>
+                                </div>
+
+                                <div class="d-flex justify-content-between">
+                                    <a href="{{ url_for('kabel.index') }}" class="btn btn-secondary">
+                                        <i class="fas fa-times me-1"></i>
+                                        Abbrechen
+                                    </a>
+                                    {{ form.submit() }}
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Beispiel-Daten -->
+                    <div class="card mt-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-lightbulb me-2"></i>
+                                Beispiel-Daten
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6>BMA (Brandmeldeanlage):</h6>
+                                    <div class="bg-light p-3 rounded">
+                                        <button type="button" class="btn btn-sm btn-outline-primary float-end" onclick="copyExample('bma')">
+                                            <i class="fas fa-copy"></i> Kopieren
+                                        </button>
+                                        <div id="bma-example">
+                                            Alu Rohr<br>
+                                            2x2x0,8 E30 Kabel<br>
+                                            2x2x0,8 Kabel rot
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6>ELA (Elektroakustische Anlage):</h6>
+                                    <div class="bg-light p-3 rounded">
+                                        <button type="button" class="btn btn-sm btn-outline-primary float-end" onclick="copyExample('ela')">
+                                            <i class="fas fa-copy"></i> Kopieren
+                                        </button>
+                                        <div id="ela-example">
+                                            Alu Rohr<br>
+                                            2x2x0,8 Kabel grau<br>
+                                            4x2x0,6 Grau
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function copyExample(type) {
+    let text = '';
+    
+    if (type === 'bma') {
+        text = 'Alu Rohr\n2x2x0,8 E30 Kabel\n2x2x0,8 Kabel rot';
+    } else if (type === 'ela') {
+        text = 'Alu Rohr\n2x2x0,8 Kabel grau\n4x2x0,6 Grau';
+    }
+    
+    // Text in Textarea einfügen
+    const textarea = document.getElementById('kabeltypen_text');
+    if (textarea) {
+        textarea.value = text;
+        textarea.focus();
+        
+        // Erfolgsmeldung anzeigen
+        const button = event.target.closest('button');
+        const originalText = button.innerHTML;
+        button.innerHTML = '<i class="fas fa-check"></i> Kopiert!';
+        button.classList.remove('btn-outline-primary');
+        button.classList.add('btn-success');
+        
+        setTimeout(() => {
+            button.innerHTML = originalText;
+            button.classList.remove('btn-success');
+            button.classList.add('btn-outline-primary');
+        }, 2000);
+    }
+}
+
+// Zeilen zählen und anzeigen
+document.addEventListener('DOMContentLoaded', function() {
+    const textarea = document.getElementById('kabeltypen_text');
+    if (textarea) {
+        const counter = document.createElement('div');
+        counter.className = 'form-text mt-1';
+        counter.id = 'line-counter';
+        textarea.parentNode.appendChild(counter);
+        
+        function updateCounter() {
+            const lines = textarea.value.split('\n').filter(line => line.trim().length > 0);
+            counter.textContent = lines.length + ' Kabeltypen erkannt';
+        }
+        
+        textarea.addEventListener('input', updateCounter);
+        updateCounter();
+    }
+});
+</script>
+{% endblock %}

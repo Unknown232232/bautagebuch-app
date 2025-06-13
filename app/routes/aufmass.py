@@ -218,8 +218,8 @@ def api_material_details(material_id):
     material = Material.query.get_or_404(material_id)
     return jsonify({
         'name': material.name,
-        'einheit': material.einheit,
-        'kategorie': material.kategorie
+        'einheit': material.unit,
+        'kategorie': material.category
     })
 
 @aufmass_bp.route('/api/check_duplicate', methods=['POST'])

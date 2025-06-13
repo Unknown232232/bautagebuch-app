@@ -4,7 +4,7 @@ from flask_login import login_required, current_user
 from app import db
 from app.models.bautagebuch import BautagebuchEntry, WochenExport
 from app.models.aufmass import AufmassEntry
-from datetime import datetime, date, timedelta
+from datetime import datetime, date, timedelta, timezone
 from reportlab.lib.pagesizes import A4
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
@@ -28,7 +28,7 @@ def wochenbericht_uebersicht():
         return redirect(url_for('dashboard.index'))
     
     # Aktuelle Woche
-    heute = date.today()
+    heute = datetime.now(timezone.utc).date()
     aktuelle_kw = heute.isocalendar()[1]
     aktuelles_jahr = heute.year
     

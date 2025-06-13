@@ -6,7 +6,7 @@ from app.models.aufmass import AufmassEntry
 from app.models.bautagebuch import BautagebuchEntry
 from app.models.user import User
 from app.models.material import Material
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from sqlalchemy import and_, or_
 
 duplikate_bp = Blueprint('duplikate', __name__)

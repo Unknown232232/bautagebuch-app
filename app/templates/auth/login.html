@@ -4,127 +4,420 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login – Bautagebuch</title>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script>
-        window.onload = () => {
-            lucide.createIcons();
-        };
-    </script>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen flex items-center justify-center px-4">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        /* Modern Login Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    <div class="max-w-md w-full space-y-6 bg-white p-8 rounded-2xl shadow-xl border border-gray-200">
-        <!-- Logo + Titel -->
-        <div class="text-center space-y-2">
-            <div class="mx-auto w-16 h-16 flex items-center justify-center bg-blue-600 text-white rounded-full shadow-md">
-                <i data-lucide="construction" class="w-6 h-6"></i>
-            </div>
-            <h2 class="text-2xl font-semibold text-gray-800">Willkommen zurück</h2>
-            <p class="text-sm text-gray-500">Melden Sie sich mit Ihren Zugangsdaten an</p>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        .logo-section {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .logo::before {
+            content: '🏗️';
+            font-size: 32px;
+        }
+
+        .welcome-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 8px;
+        }
+
+        .welcome-subtitle {
+            color: #718096;
+            font-size: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 15px 20px 15px 50px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #f8fafc;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #a0aec0;
+            font-size: 18px;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #a0aec0;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 5px;
+        }
+
+        .password-toggle:hover {
+            color: #667eea;
+        }
+
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+        }
+
+        .checkbox-wrapper input[type="checkbox"] {
+            margin-right: 8px;
+            transform: scale(1.2);
+        }
+
+        .checkbox-wrapper label {
+            font-size: 14px;
+            color: #4a5568;
+        }
+
+        .forgot-password {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .forgot-password:hover {
+            text-decoration: underline;
+        }
+
+        .login-button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .login-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+        }
+
+        .login-button:active {
+            transform: translateY(0);
+        }
+
+        .admin-note {
+            text-align: center;
+            margin-top: 25px;
+            padding-top: 25px;
+            border-top: 1px solid #e2e8f0;
+            color: #718096;
+            font-size: 14px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+            color: #a0aec0;
+            font-size: 12px;
+        }
+
+        .footer-links {
+            margin-top: 10px;
+        }
+
+        .footer-links a {
+            color: #a0aec0;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+
+        .footer-links a:hover {
+            color: #667eea;
+        }
+
+        .flash-messages {
+            margin-bottom: 20px;
+        }
+
+        .flash-message {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+        }
+
+        .flash-error {
+            background: #fed7d7;
+            color: #c53030;
+            border: 1px solid #feb2b2;
+        }
+
+        .flash-success {
+            background: #c6f6d5;
+            color: #2f855a;
+            border: 1px solid #9ae6b4;
+        }
+
+        .flash-info {
+            background: #bee3f8;
+            color: #2b6cb0;
+            border: 1px solid #90cdf4;
+        }
+
+        .error-text {
+            color: #e53e3e;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 30px 20px;
+                margin: 10px;
+            }
+
+            .welcome-title {
+                font-size: 24px;
+            }
+
+            .form-input {
+                padding: 12px 16px 12px 45px;
+            }
+        }
+
+        /* Animation */
+        .login-container {
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <!-- Logo und Titel -->
+        <div class="logo-section">
+            <div class="logo"></div>
+            <h1 class="welcome-title">Willkommen zurück</h1>
+            <p class="welcome-subtitle">Melden Sie sich mit Ihren Zugangsdaten an</p>
         </div>
 
         <!-- Flash Messages -->
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
-                {% for category, message in messages %}
-                    <div class="p-4 rounded-lg {% if category == 'error' %}bg-red-50 text-red-700 border border-red-200{% elif category == 'success' %}bg-green-50 text-green-700 border border-green-200{% else %}bg-blue-50 text-blue-700 border border-blue-200{% endif %}">
-                        <div class="flex">
-                            <div class="flex-shrink-0">
-                                {% if category == 'error' %}
-                                    <i data-lucide="alert-circle" class="w-5 h-5"></i>
-                                {% elif category == 'success' %}
-                                    <i data-lucide="check-circle" class="w-5 h-5"></i>
-                                {% else %}
-                                    <i data-lucide="info" class="w-5 h-5"></i>
-                                {% endif %}
-                            </div>
-                            <div class="ml-3">
-                                <p class="text-sm font-medium">{{ message }}</p>
-                            </div>
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="flash-message flash-{{ category }}">
+                            <span>{{ message }}</span>
                         </div>
-                    </div>
-                {% endfor %}
+                    {% endfor %}
+                </div>
             {% endif %}
         {% endwith %}
 
         <!-- Login-Formular -->
-        <form method="POST" class="space-y-5">
+        <form method="POST">
             {{ form.hidden_tag() }}
             
             <!-- Benutzername -->
-            <div>
-                {{ form.username.label(class="block text-sm font-medium text-gray-700 mb-1") }}
-                <div class="relative">
-                    {{ form.username(class="w-full pl-10 pr-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400 text-sm", placeholder="Ihr Benutzername") }}
-                    <i data-lucide="user" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+            <div class="form-group">
+                {{ form.username.label(class="form-label") }}
+                <div class="input-wrapper">
+                    <span class="input-icon">👤</span>
+                    {{ form.username(class="form-input", placeholder="Ihr Benutzername") }}
                 </div>
                 {% if form.username.errors %}
                     {% for error in form.username.errors %}
-                        <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+                        <div class="error-text">{{ error }}</div>
                     {% endfor %}
                 {% endif %}
             </div>
 
             <!-- Passwort -->
-            <div>
-                {{ form.password.label(class="block text-sm font-medium text-gray-700 mb-1") }}
-                <div class="relative">
-                    {{ form.password(class="w-full pl-10 pr-10 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400 text-sm", placeholder="••••••••", id="password-field") }}
-                    <i data-lucide="lock" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                    <button type="button" onclick="togglePassword()" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                        <i data-lucide="eye" id="eye-icon" class="w-4 h-4"></i>
+            <div class="form-group">
+                {{ form.password.label(class="form-label") }}
+                <div class="input-wrapper">
+                    <span class="input-icon">🔒</span>
+                    {{ form.password(class="form-input", placeholder="••••••••", id="password-field") }}
+                    <button type="button" class="password-toggle" onclick="togglePassword()">
+                        <span id="eye-icon">👁️</span>
                     </button>
                 </div>
                 {% if form.password.errors %}
                     {% for error in form.password.errors %}
-                        <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+                        <div class="error-text">{{ error }}</div>
                     {% endfor %}
                 {% endif %}
             </div>
 
             <!-- Optionen -->
-            <div class="flex items-center justify-between">
-                <label class="flex items-center text-sm text-gray-600">
-                    {{ form.remember_me(class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500") }}
-                    <span class="ml-2">{{ form.remember_me.label.text }}</span>
-                </label>
-                <a href="#" class="text-sm text-blue-600 hover:underline">Passwort vergessen?</a>
+            <div class="form-options">
+                <div class="checkbox-wrapper">
+                    {{ form.remember_me() }}
+                    {{ form.remember_me.label() }}
+                </div>
+                <a href="#" class="forgot-password">
+                    Passwort vergessen?
+                </a>
             </div>
 
             <!-- Login-Button -->
-            <div>
-                {{ form.submit(class="w-full py-2 text-white text-sm font-medium bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg shadow-md hover:shadow-lg hover:from-blue-700 hover:to-blue-800 transition duration-200") }}
-            </div>
+            {{ form.submit(class="login-button") }}
         </form>
 
-        <!-- Hinweis -->
-        <p class="text-center text-sm text-gray-500">
-            Noch kein Account?
-            <span class="text-gray-600 font-medium">Bitte kontaktieren Sie den Administrator</span>
-        </p>
+        <!-- Admin-Hinweis -->
+        <div class="admin-note">
+            <p>Noch kein Account? <strong>Bitte kontaktieren Sie den Administrator</strong></p>
+        </div>
 
         <!-- Footer -->
-        <footer class="text-center text-xs text-gray-400 pt-4 border-t border-gray-100">
+        <div class="footer">
             <p>&copy; 2025 Borrmann Professionals</p>
-            <div class="mt-2 space-x-3">
-                <a href="#" class="hover:text-gray-600">Impressum</a>
-                <a href="#" class="hover:text-gray-600">Datenschutz</a>
+            <div class="footer-links">
+                <a href="#">Impressum</a>
+                <a href="#">Datenschutz</a>
             </div>
-        </footer>
+        </div>
     </div>
 
-    <!-- Passwort Toggle Script -->
+    <!-- JavaScript -->
     <script>
         function togglePassword() {
             const input = document.getElementById('password-field');
             const icon = document.getElementById('eye-icon');
-            const isVisible = input.type === 'text';
-
-            input.type = isVisible ? 'password' : 'text';
-            icon.setAttribute("data-lucide", isVisible ? "eye" : "eye-off");
-            lucide.createIcons();
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.textContent = '🙈';
+            } else {
+                input.type = 'password';
+                icon.textContent = '👁️';
+            }
         }
+
+        // Form-Validierung
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const username = document.querySelector('input[name="username"]').value;
+            const password = document.querySelector('input[name="password"]').value;
+            
+            if (!username.trim() || !password.trim()) {
+                e.preventDefault();
+                alert('Bitte füllen Sie alle Felder aus.');
+            }
+        });
+
+        // Smooth focus animations
+        document.querySelectorAll('.form-input').forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.style.transform = 'scale(1.02)';
+            });
+            
+            input.addEventListener('blur', function() {
+                this.parentElement.style.transform = 'scale(1)';
+            });
+        });
     </script>
 </body>
 </html>

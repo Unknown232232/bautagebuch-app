@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bulk Material Import – Bautagebuch</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        window.onload = () => {
+            lucide.createIcons();
+        };
+    </script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <i data-lucide="construction" class="w-8 h-8 text-blue-600"></i>
+                        <span class="ml-2 text-xl font-semibold text-gray-900">Bautagebuch</span>
+                    </div>
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="{{ url_for('dashboard.admin') }}" class="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium">Dashboard</a>
+                        <a href="{{ url_for('admin.materials') }}" class="bg-blue-100 text-blue-700 px-3 py-2 rounded-md text-sm font-medium">Materialien</a>
+                        <a href="{{ url_for('aufmass.liste') }}" class="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium">Aufmaße</a>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span class="text-sm text-gray-700">Willkommen, {{ current_user.username }}</span>
+                    <a href="{{ url_for('auth.logout') }}" class="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium">
+                        <i data-lucide="log-out" class="w-4 h-4 inline mr-1"></i>
+                        Abmelden
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-4xl mx-auto py-6 sm:px-6 lg:px-8">
+        <!-- Header -->
+        <div class="px-4 py-6 sm:px-0">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">Bulk Material Import</h1>
+                    <p class="mt-1 text-sm text-gray-600">Importieren Sie mehrere Materialien gleichzeitig</p>
+                </div>
+                <div class="flex space-x-3">
+                    <a href="{{ url_for('admin.materials') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                        <i data-lucide="arrow-left" class="w-4 h-4 mr-2"></i>
+                        Zurück
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="px-4 py-6 sm:px-0">
+                    {% for category, message in messages %}
+                        <div class="mb-4 p-4 rounded-lg {% if category == 'error' %}bg-red-50 text-red-700 border border-red-200{% elif category == 'success' %}bg-green-50 text-green-700 border border-green-200{% else %}bg-blue-50 text-blue-700 border border-blue-200{% endif %}">
+                            <div class="flex">
+                                <div class="flex-shrink-0">
+                                    {% if category == 'error' %}
+                                        <i data-lucide="alert-circle" class="w-5 h-5"></i>
+                                    {% elif category == 'success' %}
+                                        <i data-lucide="check-circle" class="w-5 h-5"></i>
+                                    {% else %}
+                                        <i data-lucide="info" class="w-5 h-5"></i>
+                                    {% endif %}
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-sm font-medium">{{ message }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <!-- Import Methods -->
+        <div class="px-4 py-6 sm:px-0">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                
+                <!-- CSV Upload -->
+                <div class="bg-white shadow rounded-lg p-6">
+                    <div class="flex items-center mb-4">
+                        <i data-lucide="file-text" class="w-6 h-6 text-blue-600 mr-3"></i>
+                        <h3 class="text-lg font-medium text-gray-900">CSV-Datei hochladen</h3>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-4">Laden Sie eine CSV-Datei mit Materialien hoch</p>
+                    
+                    <form method="POST" enctype="multipart/form-data" action="{{ url_for('admin.bulk_add_materials') }}">
+                        {{ form.hidden_tag() if form }}
+                        
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">CSV-Datei auswählen</label>
+                            <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                                <div class="space-y-1 text-center">
+                                    <i data-lucide="upload" class="mx-auto h-12 w-12 text-gray-400"></i>
+                                    <div class="flex text-sm text-gray-600">
+                                        <label for="csv_file" class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
+                                            <span>CSV-Datei hochladen</span>
+                                            <input id="csv_file" name="csv_file" type="file" accept=".csv" class="sr-only" onchange="updateFileName(this)">
+                                        </label>
+                                        <p class="pl-1">oder per Drag & Drop</p>
+                                    </div>
+                                    <p class="text-xs text-gray-500">CSV bis zu 10MB</p>
+                                    <p id="file-name" class="text-sm text-gray-900 font-medium"></p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            <i data-lucide="upload" class="w-4 h-4 mr-2"></i>
+                            CSV importieren
+                        </button>
+                    </form>
+                    
+                    <!-- CSV Format Info -->
+                    <div class="mt-4 p-3 bg-gray-50 rounded-md">
+                        <h4 class="text-sm font-medium text-gray-900 mb-2">CSV-Format:</h4>
+                        <code class="text-xs text-gray-600">name,kategorie,einheit,beschreibung</code>
+                        <p class="text-xs text-gray-500 mt-1">Beispiel: "Beton C25/30,Beton,m³,Standardbeton"</p>
+                    </div>
+                </div>
+
+                <!-- Manual Entry -->
+                <div class="bg-white shadow rounded-lg p-6">
+                    <div class="flex items-center mb-4">
+                        <i data-lucide="edit" class="w-6 h-6 text-green-600 mr-3"></i>
+                        <h3 class="text-lg font-medium text-gray-900">Manuelle Eingabe</h3>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-4">Geben Sie mehrere Materialien manuell ein</p>
+                    
+                    <form method="POST" action="{{ url_for('admin.bulk_add_materials') }}">
+                        {{ form.hidden_tag() if form }}
+                        
+                        <div class="mb-4">
+                            <label for="materials_text" class="block text-sm font-medium text-gray-700 mb-2">Materialien (ein Material pro Zeile)</label>
+                            <textarea id="materials_text" name="materials_text" rows="8" 
+                                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                      placeholder="Beton C25/30,Beton,m³,Standardbeton&#10;Mauerziegel,Mauerwerk,Stk,Hochlochziegel&#10;Putz innen,Putz,m²,Innenputz"></textarea>
+                        </div>
+                        
+                        <button type="submit" class="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                            <i data-lucide="plus" class="w-4 h-4 mr-2"></i>
+                            Materialien hinzufügen
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Standard Materials -->
+        <div class="px-4 py-6 sm:px-0">
+            <div class="bg-white shadow rounded-lg p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center">
+                        <i data-lucide="package" class="w-6 h-6 text-purple-600 mr-3"></i>
+                        <h3 class="text-lg font-medium text-gray-900">Standard-Materialien</h3>
+                    </div>
+                    <button onclick="selectAllStandard()" class="text-sm text-blue-600 hover:text-blue-800">Alle auswählen</button>
+                </div>
+                <p class="text-sm text-gray-600 mb-4">Wählen Sie aus vorgefertigten Standard-Materialien</p>
+                
+                <form method="POST" action="{{ url_for('admin.bulk_add_materials') }}">
+                    {{ form.hidden_tag() if form }}
+                    <input type="hidden" name="action" value="standard">
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                        <!-- Beton -->
+                        <div class="border border-gray-200 rounded-lg p-3">
+                            <h4 class="font-medium text-gray-900 mb-2">Beton</h4>
+                            <div class="space-y-2">
+                                <label class="flex items-center text-sm">
+                                    <input type="checkbox" name="standard_materials" value="Beton C20/25,Beton,m³" class="mr-2">
+                                    Beton C20/25
+                                </label>
+                                <label class="flex items-center text-sm">
+                                    <input type="checkbox" name="standard_materials" value="Beton C25/30,Beton,m³" class="mr-2">
+                                    Beton C25/30
+                                </label>
+                                <label class="flex items-center text-sm">
+                                    <input type="checkbox" name="standard_materials" value="Estrich,Beton,m³" class="mr-2">
+                                    Estrich
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Mauerwerk -->
+                        <div class="border border-gray-200 rounded-lg p-3">
+                            <h4 class="font-medium text-gray-900 mb-2">Mauerwerk</h4>
+                            <div class="space-y-2">
+                                <label class="flex items-center text-sm">
+                                    <input type="checkbox" name="standard_materials" value="Mauerziegel,Mauerwerk,Stk" class="mr-2">
+                                    Mauerziegel
+                                </label>
+                                <label class="flex items-center text-sm">
+                                    <input type="checkbox" name="standard_materials" value="Kalksandstein,Mauerwerk,Stk" class="mr-2">
+                                    Kalksandstein
+                                </label>
+                                <label class="flex items-center text-sm">
+                                    <input type="checkbox" name="standard_materials" value="Porenbeton,Mauerwerk,Stk" class="mr-2">
+                                    Porenbeton
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Putz -->
+                        <div class="border border-gray-200 rounded-lg p-3">
+                            <h4 class="font-medium text-gray-900 mb-2">Putz</h4>
+                            <div class="space-y-2">
+                                <label class="flex items-center text-sm">
+                                    <input type="checkbox" name="standard_materials" value="Innenputz,Putz,m²" class="mr-2">
+                                    Innenputz
+                                </label>
+                                <label class="flex items-center text-sm">
+                                    <input type="checkbox" name="standard_materials" value="Außenputz,Putz,m²" class="mr-2">
+                                    Außenputz
+                                </label>
+                                <label class="flex items-center text-sm">
+                                    <input type="checkbox" name="standard_materials" value="Grundputz,Putz,m²" class="mr-2">
+                                    Grundputz
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Stahl -->
+                        <div class="border border-gray-200 rounded-lg p-3">
+                            <h4 class="font-medium text-gray-900 mb-2">Stahl</h4>
+                            <div class="space-y-2">
+                                <label class="flex items-center text-sm">
+                                    <input type="checkbox" name="standard_materials" value="Bewehrungsstahl,Stahl,kg" class="mr-2">
+                                    Bewehrungsstahl
+                                </label>
+                                <label class="flex items-center text-sm">
+                                    <input type="checkbox" name="standard_materials" value="Baustahlmatte,Stahl,m²" class="mr-2">
+                                    Baustahlmatte
+                                </label>
+                                <label class="flex items-center text-sm">
+                                    <input type="checkbox" name="standard_materials" value="Stahlträger,Stahl,m" class="mr-2">
+                                    Stahlträger
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Holz -->
+                        <div class="border border-gray-200 rounded-lg p-3">
+                            <h4 class="font-medium text-gray-900 mb-2">Holz</h4>
+                            <div class="space-y-2">
+                                <label class="flex items-center text-sm">
+                                    <input type="checkbox" name="standard_materials" value="Konstruktionsholz,Holz,m" class="mr-2">
+                                    Konstruktionsholz
+                                </label>
+                                <label class="flex items-center text-sm">
+                                    <input type="checkbox" name="standard_materials" value="Schalung,Holz,m²" class="mr-2">
+                                    Schalung
+                                </label>
+                                <label class="flex items-center text-sm">
+                                    <input type="checkbox" name="standard_materials" value="Dachlatten,Holz,m" class="mr-2">
+                                    Dachlatten
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Sonstiges -->
+                        <div class="border border-gray-200 rounded-lg p-3">
+                            <h4 class="font-medium text-gray-900 mb-2">Sonstiges</h4>
+                            <div class="space-y-2">
+                                <label class="flex items-center text-sm">
+                                    <input type="checkbox" name="standard_materials" value="Dämmung,Sonstiges,m²" class="mr-2">
+                                    Dämmung
+                                </label>
+                                <label class="flex items-center text-sm">
+                                    <input type="checkbox" name="standard_materials" value="Abdichtung,Sonstiges,m²" class="mr-2">
+                                    Abdichtung
+                                </label>
+                                <label class="flex items-center text-sm">
+                                    <input type="checkbox" name="standard_materials" value="Fliesen,Sonstiges,m²" class="mr-2">
+                                    Fliesen
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
+                        <i data-lucide="check" class="w-4 h-4 mr-2"></i>
+                        Ausgewählte Materialien hinzufügen
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function updateFileName(input) {
+            const fileName = input.files[0]?.name;
+            const fileNameElement = document.getElementById('file-name');
+            if (fileName) {
+                fileNameElement.textContent = fileName;
+            } else {
+                fileNameElement.textContent = '';
+            }
+        }
+        
+        function selectAllStandard() {
+            const checkboxes = document.querySelectorAll('input[name="standard_materials"]');
+            const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+            checkboxes.forEach(cb => cb.checked = !allChecked);
+        }
+    </script>
+</body>
+</html>

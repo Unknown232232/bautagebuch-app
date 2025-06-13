@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Impressum - Bautagebuch</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('dashboard') }}">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Borrmann Logo" height="40" class="me-2">
+                Bautagebuch
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="{{ url_for('dashboard') }}">
+                    <i class="fas fa-tachometer-alt me-1"></i>Dashboard
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h2 class="mb-0"><i class="fas fa-info-circle me-2"></i>Impressum</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="legal-content">
+                            <h4>Angaben gemäß § 5 TMG</h4>
+                            
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <div class="company-info">
+                                        <h5>Borrmann Professionals GmbH</h5>
+                                        <p class="mb-1">Musterstraße 123<br>
+                                        12345 Musterstadt<br>
+                                        Deutschland</p>
+                                        
+                                        <p class="mb-1">
+                                            <strong>Telefon:</strong> +49 (0) 123 456789<br>
+                                            <strong>E-Mail:</strong> info@borrmann-professionals.de<br>
+                                            <strong>Website:</strong> www.borrmann-professionals.de
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="legal-info">
+                                        <h5>Rechtliche Angaben</h5>
+                                        <p class="mb-1">
+                                            <strong>Handelsregister:</strong> HRB 12345<br>
+                                            <strong>Registergericht:</strong> Amtsgericht Musterstadt<br>
+                                            <strong>Umsatzsteuer-ID:</strong> DE123456789
+                                        </p>
+                                        
+                                        <p class="mb-1">
+                                            <strong>Geschäftsführer:</strong><br>
+                                            Max Borrmann
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr>
+
+                            <h4>Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV</h4>
+                            <p>Max Borrmann<br>
+                            Musterstraße 123<br>
+                            12345 Musterstadt</p>
+
+                            <hr>
+
+                            <h4>Haftungsausschluss</h4>
+                            
+                            <h5>Haftung für Inhalte</h5>
+                            <p>Als Diensteanbieter sind wir gemäß § 7 Abs.1 TMG für eigene Inhalte auf diesen Seiten nach den allgemeinen Gesetzen verantwortlich. Nach §§ 8 bis 10 TMG sind wir als Diensteanbieter jedoch nicht unter der Verpflichtung, übermittelte oder gespeicherte fremde Informationen zu überwachen oder nach Umständen zu forschen, die auf eine rechtswidrige Tätigkeit hinweisen.</p>
+
+                            <h5>Haftung für Links</h5>
+                            <p>Unser Angebot enthält Links zu externen Websites Dritter, auf deren Inhalte wir keinen Einfluss haben. Deshalb können wir für diese fremden Inhalte auch keine Gewähr übernehmen. Für die Inhalte der verlinkten Seiten ist stets der jeweilige Anbieter oder Betreiber der Seiten verantwortlich.</p>
+
+                            <h5>Urheberrecht</h5>
+                            <p>Die durch die Seitenbetreiber erstellten Inhalte und Werke auf diesen Seiten unterliegen dem deutschen Urheberrecht. Die Vervielfältigung, Bearbeitung, Verbreitung und jede Art der Verwertung außerhalb der Grenzen des Urheberrechtes bedürfen der schriftlichen Zustimmung des jeweiligen Autors bzw. Erstellers.</p>
+
+                            <hr>
+
+                            <div class="text-center mt-4">
+                                <p class="text-muted">
+                                    <small>Letzte Aktualisierung: Juni 2025</small>
+                                </p>
+                                <a href="{{ url_for('dashboard') }}" class="btn btn-primary">
+                                    <i class="fas fa-arrow-left me-1"></i>Zurück zum Dashboard
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Datenschutz Karte -->
+                <div class="card border-0 shadow-sm mt-4">
+                    <div class="card-header bg-secondary text-white">
+                        <h3 class="mb-0"><i class="fas fa-shield-alt me-2"></i>Datenschutzerklärung</h3>
+                    </div>
+                    <div class="card-body">
+                        <h4>1. Datenschutz auf einen Blick</h4>
+                        
+                        <h5>Allgemeine Hinweise</h5>
+                        <p>Die folgenden Hinweise geben einen einfachen Überblick darüber, was mit Ihren personenbezogenen Daten passiert, wenn Sie diese Website besuchen. Personenbezogene Daten sind alle Daten, mit denen Sie persönlich identifiziert werden können.</p>
+
+                        <h5>Datenerfassung auf dieser Website</h5>
+                        <p><strong>Wer ist verantwortlich für die Datenerfassung auf dieser Website?</strong><br>
+                        Die Datenverarbeitung auf dieser Website erfolgt durch den Websitebetreiber. Dessen Kontaktdaten können Sie dem Impressum dieser Website entnehmen.</p>
+
+                        <p><strong>Wie erfassen wir Ihre Daten?</strong><br>
+                        Ihre Daten werden zum einen dadurch erhoben, dass Sie uns diese mitteilen. Hierbei kann es sich z.B. um Daten handeln, die Sie in ein Kontaktformular eingeben oder bei der Anmeldung im Bautagebuch-System.</p>
+
+                        <p><strong>Wofür nutzen wir Ihre Daten?</strong><br>
+                        Die Daten werden ausschließlich für die Funktionalität des Bautagebuch-Systems verwendet, einschließlich der Verwaltung von Aufmaßdaten und Benutzerkonten.</p>
+
+                        <h4>2. Hosting und Content Delivery Networks (CDN)</h4>
+                        <p>Diese Website wird bei einem externen Dienstleister gehostet (Hoster). Die personenbezogenen Daten, die auf dieser Website erfasst werden, werden auf den Servern des Hosters gespeichert.</p>
+
+                        <h4>3. Allgemeine Hinweise und Pflichtinformationen</h4>
+                        
+                        <h5>Datenschutz</h5>
+                        <p>Die Betreiber dieser Seiten nehmen den Schutz Ihrer persönlichen Daten sehr ernst. Wir behandeln Ihre personenbezogenen Daten vertraulich und entsprechend der gesetzlichen Datenschutzbestimmungen sowie dieser Datenschutzerklärung.</p>
+
+                        <h5>Hinweis zur verantwortlichen Stelle</h5>
+                        <p>Die verantwortliche Stelle für die Datenverarbeitung auf dieser Website ist:</p>
+                        <p>Borrmann Professionals GmbH<br>
+                        Musterstraße 123<br>
+                        12345 Musterstadt<br>
+                        Telefon: +49 (0) 123 456789<br>
+                        E-Mail: datenschutz@borrmann-professionals.de</p>
+
+                        <h4>4. Datenerfassung auf dieser Website</h4>
+                        
+                        <h5>Cookies</h5>
+                        <p>Diese Website verwendet ausschließlich technisch notwendige Cookies für die Funktionalität des Login-Systems und der Session-Verwaltung.</p>
+
+                        <h5>Server-Log-Dateien</h5>
+                        <p>Der Provider der Seiten erhebt und speichert automatisch Informationen in sogenannten Server-Log-Dateien, die Ihr Browser automatisch an uns übermittelt.</p>
+
+                        <h5>Registrierung auf dieser Website</h5>
+                        <p>Sie können sich auf dieser Website registrieren, um zusätzliche Funktionen der Seite zu nutzen. Die dabei eingegebenen Daten verwenden wir nur zum Zwecke der Nutzung des jeweiligen Angebotes oder Dienstes.</p>
+
+                        <h4>5. Ihre Rechte</h4>
+                        <p>Sie haben jederzeit das Recht unentgeltlich Auskunft über Herkunft, Empfänger und Zweck Ihrer gespeicherten personenbezogenen Daten zu erhalten. Sie haben außerdem ein Recht, die Berichtigung, Sperrung oder Löschung dieser Daten zu verlangen.</p>
+
+                        <div class="alert alert-info mt-4">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Kontakt:</strong> Bei Fragen zum Datenschutz wenden Sie sich bitte an: datenschutz@borrmann-professionals.de
+                        </div>
+
+                        <div class="text-center mt-4">
+                            <p class="text-muted">
+                                <small>Letzte Aktualisierung: Juni 2025</small>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-light py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="text-muted mb-0">&copy; 2025 Borrmann Professionals. Alle Rechte vorbehalten.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <a href="/impressum" class="text-muted me-3">Impressum</a>
+                    <a href="/datenschutz" class="text-muted">Datenschutz</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

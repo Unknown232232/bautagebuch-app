@@ -1,0 +1,148 @@
+<!-- templates/components/filter.html -->
+<div class="filter-container bg-light p-4 rounded mb-4">
+    <form method="GET" id="filterForm" class="row g-3">
+        
+        <!-- Datum Filter -->
+        <div class="col-md-3">
+            <label for="datum_von" class="form-label">Datum von</label>
+            <input type="date" 
+                   class="form-control" 
+                   id="datum_von" 
+                   name="datum_von" 
+                   value="{{ request.args.get('datum_von', '') }}">
+        </div>
+        
+        <div class="col-md-3">
+            <label for="datum_bis" class="form-label">Datum bis</label>
+            <input type="date" 
+                   class="form-control" 
+                   id="datum_bis" 
+                   name="datum_bis" 
+                   value="{{ request.args.get('datum_bis', '') }}">
+        </div>
+        
+        <!-- Kalenderwoche Filter -->
+        <div class="col-md-2">
+            <label for="kalenderwoche" class="form-label">KW</label>
+            <select class="form-select" id="kalenderwoche" name="kalenderwoche">
+                <option value="">Alle Wochen</option>
+                {% for i in range(1, 54) %}
+                    <option value="{{ i }}" 
+                            {% if request.args.get('kalenderwoche') == i|string %}selected{% endif %}>
+                        KW {{ i }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="col-md-2">
+            <label for="jahr" class="form-label">Jahr</label>
+            <select class="form-select" id="jahr" name="jahr">
+                <option value="">Alle Jahre</option>
+                {% for jahr in range(2023, 2030) %}
+                    <option value="{{ jahr }}" 
+                            {% if request.args.get('jahr') == jahr|string %}selected{% endif %}>
+                        {{ jahr }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <!-- Ort Filter -->
+        <div class="col-md-3">
+            <label for="ort" class="form-label">Ort/Raum</label>
+            <input type="text" 
+                   class="form-control" 
+                   id="ort" 
+                   name="ort" 
+                   placeholder="Raum suchen..."
+                   value="{{ request.args.get('ort', '') }}"
+                   list="orte_list">
+            
+            {% if orte %}
+            <datalist id="orte_list">
+                {% for ort in orte %}
+                    <option value="{{ ort }}">
+                {% endfor %}
+            </datalist>
+            {% endif %}
+        </div>
+        
+        <!-- Material Filter -->
+        <div class="col-md-3">
+            <label for="material" class="form-label">Material</label>
+            <select class="form-select" id="material" name="material">
+                <option value="">Alle Materialien</option>
+                {% if materialien %}
+                    {% for material in materialien %}
+                        <option value="{{ material }}" 
+                                {% if request.args.get('material') == material %}selected{% endif %}>
+                            {{ material }}
+                        </option>
+                    {% endfor %}
+                {% endif %}
+            </select>
+        </div>
+        
+        <!-- Mitarbeiter Filter (nur für Bauleiter/Admin) -->
+        {% if current_user.rolle in ['bauleiter', 'admin'] %}
+        <div class="col-md-3">
+            <label for="mitarbeiter" class="form-label">Mitarbeiter</label>
+            <select class="form-select" id="mitarbeiter" name="mitarbeiter">
+                <option value="">Alle Mitarbeiter</option>
+                {% if mitarbeiter %}
+                    {% for ma in mitarbeiter %}
+                        <option value="{{ ma }}" 
+                                {% if request.args.get('mitarbeiter') == ma %}selected{% endif %}>
+                            {{ ma }}
+                        </option>
+                    {% endfor %}
+                {% endif %}
+            </select>
+        </div>
+        {% endif %}
+        
+        <!-- Sortierung -->
+        <div class="col-md-3">
+            <label for="sortierung" class="form-label">Sortierung</label>
+            <select class="form-select" id="sortierung" name="sortierung">
+                <option value="datum_desc" 
+                        {% if request.args.get('sortierung', 'datum_desc') == 'datum_desc' %}selected{% endif %}>
+                    Neueste zuerst
+                </option>
+                <option value="datum_asc" 
+                        {% if request.args.get('sortierung') == 'datum_asc' %}selected{% endif %}>
+                    Älteste zuerst
+                </option>
+                <option value="ort_asc" 
+                        {% if request.args.get('sortierung') == 'ort_asc' %}selected{% endif %}>
+                    Ort A-Z
+                </option>
+                <option value="material_asc" 
+                        {% if request.args.get('sortierung') == 'material_asc' %}selected{% endif %}>
+                    Material A-Z
+                </option>
+                <option value="menge_desc" 
+                        {% if request.args.get('sortierung') == 'menge_desc' %}selected{% endif %}>
+                    Höchste Menge
+                </option>
+            </select>
+        </div>
+        
+        <!-- Buttons -->
+        <div class="col-12">
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-search"></i> Filtern
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="clearFilters()">
+                    <i class="fas fa-times"></i> Zurücksetzen
+                </button>
+                <button type="button" class="btn btn-outline-primary" onclick="toggleAdvancedFilter()">
+                    <i class="fas fa-cog"></i> Erweitert
+                </button>
+            </div>
+        </div>
+        
+        <!-- Erweiterte Filter (versteckt) -->
+        <div id="adv

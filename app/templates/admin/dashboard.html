@@ -1,0 +1,246 @@
+<!-- templates/admin/dashboard.html -->
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-header">
+                <h1 class="page-title">
+                    <i class="fas fa-cog"></i> Admin Dashboard
+                </h1>
+                <p class="page-description">Verwaltung der Bautagebuch-App</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistik Cards -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="stats-card">
+                <div class="stats-icon bg-primary">
+                    <i class="fas fa-boxes"></i>
+                </div>
+                <div class="stats-content">
+                    <h3 class="stats-number">{{ stats.total_materials }}</h3>
+                    <p class="stats-label">Materialien gesamt</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6">
+            <div class="stats-card">
+                <div class="stats-icon bg-success">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stats-content">
+                    <h3 class="stats-number">{{ stats.active_materials }}</h3>
+                    <p class="stats-label">Aktive Materialien</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6">
+            <div class="stats-card">
+                <div class="stats-icon bg-warning">
+                    <i class="fas fa-pause-circle"></i>
+                </div>
+                <div class="stats-content">
+                    <h3 class="stats-number">{{ stats.inactive_materials }}</h3>
+                    <p class="stats-label">Inaktive Materialien</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6">
+            <div class="stats-card">
+                <div class="stats-icon bg-info">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stats-content">
+                    <h3 class="stats-number">{{ stats.total_users }}</h3>
+                    <p class="stats-label">Benutzer</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Schnellzugriff</h5>
+                </div>
+                <div class="card-body">
+                    <div class="quick-actions">
+                        <a href="{{ url_for('admin.materials') }}" class="btn btn-primary btn-lg">
+                            <i class="fas fa-boxes"></i>
+                            Materialien verwalten
+                        </a>
+                        <a href="{{ url_for('admin.add_material') }}" class="btn btn-success btn-lg">
+                            <i class="fas fa-plus"></i>
+                            Material hinzufügen
+                        </a>
+                        <a href="{{ url_for('admin.bulk_add_materials') }}" class="btn btn-info btn-lg">
+                            <i class="fas fa-upload"></i>
+                            Bulk-Import
+                        </a>
+                        <a href="{{ url_for('main.duplicates') }}" class="btn btn-warning btn-lg">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            Duplikate prüfen
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+<!-- templates/admin/materials.html -->
+{% extends "base.html" %}
+
+{% block title %}Materialverwaltung{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-header">
+                <h1 class="page-title">
+                    <i class="fas fa-boxes"></i> Materialverwaltung
+                </h1>
+                <div class="page-actions">
+                    <a href="{{ url_for('admin.add_material') }}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Material hinzufügen
+                    </a>
+                    <a href="{{ url_for('admin.bulk_add_materials') }}" class="btn btn-info">
+                        <i class="fas fa-upload"></i> Bulk-Import
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter/Suche -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form method="GET" class="row g-3">
+                        <div class="col-md-4">
+                            {{ form.search.label(class="form-label") }}
+                            {{ form.search(class="form-control", value=request.args.get('search', '')) }}
+                        </div>
+                        <div class="col-md-3">
+                            {{ form.category.label(class="form-label") }}
+                            {{ form.category(class="form-select") }}
+                        </div>
+                        <div class="col-md-3">
+                            {{ form.status.label(class="form-label") }}
+                            {{ form.status(class="form-select") }}
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary me-2">
+                                <i class="fas fa-search"></i> Suchen
+                            </button>
+                            <a href="{{ url_for('admin.materials') }}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i>
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Materialien-Tabelle -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Kategorie</th>
+                                    <th>Einheit</th>
+                                    <th>Status</th>
+                                    <th>Beschreibung</th>
+                                    <th>Aktionen</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for material in materials %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ material.name }}</strong>
+                                    </td>
+                                    <td>
+                                        {% if material.category %}
+                                            <span class="badge bg-light text-dark">{{ material.category }}</span>
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ material.unit }}</td>
+                                    <td>
+                                        {% if material.is_active %}
+                                            <span class="badge bg-success">Aktiv</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Inaktiv</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if material.description %}
+                                            {{ material.description[:50] }}{% if material.description|length > 50 %}...{% endif %}
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="{{ url_for('admin.edit_material', id=material.id) }}" 
+                                               class="btn btn-outline-primary" title="Bearbeiten">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <form method="POST" 
+                                                  action="{{ url_for('admin.toggle_material_status', id=material.id) }}" 
+                                                  class="d-inline">
+                                                <button type="submit" 
+                                                        class="btn btn-outline-{% if material.is_active %}warning{% else %}success{% endif %}"
+                                                        title="{% if material.is_active %}Deaktivieren{% else %}Aktivieren{% endif %}">
+                                                    <i class="fas fa-{% if material.is_active %}pause{% else %}play{% endif %}"></i>
+                                                </button>
+                                            </form>
+                                            <form method="POST" 
+                                                  action="{{ url_for('admin.delete_material', id=material.id) }}" 
+                                                  class="d-inline"
+                                                  onsubmit="return confirm('Material wirklich löschen?')">
+                                                <button type="submit" class="btn btn-outline-danger" title="Löschen">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    {% if not materials %}
+                    <div class="text-center py-4">
+                        <p class="text-muted">Keine Materialien gefunden.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

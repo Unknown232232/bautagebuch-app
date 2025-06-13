@@ -1,0 +1,412 @@
+<!-- bautagebuch-app/templates/main/dashboard.html -->
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Bautagebuch{% endblock %}
+
+{% block extra_css %}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Sidebar -->
+    <div class="col-lg-3 col-md-4">
+        <div class="sidebar">
+            <h5 class="mb-3">
+                <i class="fas fa-tachometer-alt text-primary"></i>
+                Navigation
+            </h5>
+            <ul class="sidebar-nav">
+                <li><a href="{{ url_for('main.dashboard') }}" class="active">
+                    <i class="fas fa-home"></i> Dashboard
+                </a></li>
+                
+                {% if current_user.role in ['mitarbeiter', 'bauleiter', 'admin'] %}
+                <li><a href="{{ url_for('aufmass.eingabe') }}">
+                    <i class="fas fa-plus-circle"></i> Aufmaß eingeben
+                </a></li>
+                <li><a href="{{ url_for('aufmass.liste') }}">
+                    <i class="fas fa-list"></i> Meine Aufmaße
+                </a></li>
+                {% endif %}
+                
+                {% if current_user.role in ['bauleiter', 'admin'] %}
+                <li><a href="{{ url_for('reports.wochenbericht') }}">
+                    <i class="fas fa-file-alt"></i> Wochenberichte
+                </a></li>
+                <li><a href="{{ url_for('reports.export') }}">
+                    <i class="fas fa-download"></i> Export
+                </a></li>
+                {% endif %}
+                
+                {% if current_user.role == 'admin' %}
+                <li><hr class="my-2"></li>
+                <li><a href="{{ url_for('admin.users') }}">
+                    <i class="fas fa-users"></i> Benutzer
+                </a></li>
+                <li><a href="{{ url_for('admin.materials') }}">
+                    <i class="fas fa-tools"></i> Materialien
+                </a></li>
+                <li><a href="{{ url_for('admin.duplicates') }}">
+                    <i class="fas fa-exclamation-triangle"></i> Duplikate
+                </a></li>
+                {% endif %}
+            </ul>
+            
+            <!-- Quick Actions -->
+            <div class="mt-4">
+                <h6 class="text-muted mb-2">Schnellzugriff</h6>
+                {% if current_user.role in ['mitarbeiter', 'bauleiter', 'admin'] %}
+                <a href="{{ url_for('aufmass.eingabe') }}" class="btn btn-primary btn-sm w-100 mb-2">
+                    <i class="fas fa-plus"></i> Neues Aufmaß
+                </a>
+                {% endif %}
+                {% if current_user.role in ['bauleiter', 'admin'] %}
+                <a href="{{ url_for('main.suche') }}" class="btn btn-secondary btn-sm w-100">
+                    <i class="fas fa-search"></i> Suchen
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="col-lg-9 col-md-8">
+        <div class="content-area">
+            <!-- Welcome Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h2 mb-1">Willkommen, {{ current_user.username }}!</h1>
+                    <p class="text-muted">{{ current_user.role.title() }} · Heute ist {{ moment().format('dddd, DD.MM.YYYY') }}</p>
+                </div>
+                <div class="text-end">
+                    <div class="badge badge-primary">
+                        <i class="fas fa-clock"></i>
+                        <span id="currentTime">{{ moment().format('HH:mm') }}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Statistics Cards -->
+            <div class="dashboard-stats">
+                {% if current_user.role in ['mitarbeiter', 'bauleiter', 'admin'] %}
+                <div class="stat-card">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="stat-number">{{ stats.total_aufmasse or 0 }}</div>
+                            <div class="stat-label">Aufmaße gesamt</div>
+                            <div class="stat-trend positive">
+                                <i class="fas fa-arrow-up"></i>
+                                +{{ stats.aufmasse_this_week or 0 }} diese Woche
+                            </div>
+                        </div>
+                        <div class="text-primary">
+                            <i class="fas fa-ruler-combined fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                {% if current_user.role in ['bauleiter', 'admin'] %}
+                <div class="stat-card">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="stat-number">{{ stats.total_berichte or 0 }}</div>
+                            <div class="stat-label">Wochenberichte</div>
+                            <div class="stat-trend {% if stats.berichte_trend >= 0 %}positive{% else %}negative{% endif %}">
+                                <i class="fas fa-arrow-{% if stats.berichte_trend >= 0 %}up{% else %}down{% endif %}"></i>
+                                {% if stats.berichte_trend >= 0 %}+{% endif %}{{ stats.berichte_trend or 0 }}% zum Vormonat
+                            </div>
+                        </div>
+                        <div class="text-success">
+                            <i class="fas fa-file-alt fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="stat-number">{{ stats.active_projects or 0 }}</div>
+                            <div class="stat-label">Aktive Projekte</div>
+                            <div class="stat-trend">
+                                <i class="fas fa-info-circle"></i>
+                                {{ stats.projects_this_month or 0 }} diesen Monat
+                            </div>
+                        </div>
+                        <div class="text-warning">
+                            <i class="fas fa-project-diagram fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                {% if current_user.role == 'admin' %}
+                <div class="stat-card">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="stat-number">{{ stats.total_users or 0 }}</div>
+                            <div class="stat-label">Benutzer</div>
+                            <div class="stat-trend">
+                                <i class="fas fa-users"></i>
+                                {{ stats.active_users or 0 }} aktiv
+                            </div>
+                        </div>
+                        <div class="text-info">
+                            <i class="fas fa-users fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Content Rows -->
+            <div class="row">
+                <!-- Recent Activities / My Entries -->
+                <div class="col-lg-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-clock text-primary"></i>
+                                {% if current_user.role == 'mitarbeiter' %}
+                                    Meine letzten Einträge
+                                {% else %}
+                                    Letzte Aktivitäten
+                                {% endif %}
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            {% if recent_entries %}
+                            <div class="table-container">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Datum</th>
+                                            <th>Material</th>
+                                            <th>Ort</th>
+                                            <th>Menge</th>
+                                            {% if current_user.role != 'mitarbeiter' %}
+                                            <th>Mitarbeiter</th>
+                                            {% endif %}
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for entry in recent_entries %}
+                                        <tr>
+                                            <td>{{ entry.datum.strftime('%d.%m.%Y') }}</td>
+                                            <td>
+                                                <strong>{{ entry.material }}</strong>
+                                            </td>
+                                            <td>
+                                                <i class="fas fa-map-marker-alt text-muted"></i>
+                                                {{ entry.ort }}
+                                            </td>
+                                            <td>
+                                                <span class="badge badge-secondary">
+                                                    {{ entry.menge }} {{ entry.einheit or 'Stk' }}
+                                                </span>
+                                            </td>
+                                            {% if current_user.role != 'mitarbeiter' %}
+                                            <td>{{ entry.mitarbeiter.username }}</td>
+                                            {% endif %}
+                                            <td>
+                                                {% if entry.exported %}
+                                                    <span class="badge badge-success">
+                                                        <i class="fas fa-check-circle"></i> Exportiert
+                                                    </span>
+                                                {% else %}
+                                                    <span class="badge badge-warning">
+                                                        <i class="fas fa-clock"></i> Ausstehend
+                                                    </span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="text-center mt-3">
+                                <a href="{{ url_for('aufmass.liste') }}" class="btn btn-outline-primary">
+                                    <i class="fas fa-list"></i> Alle anzeigen
+                                </a>
+                            </div>
+                            {% else %}
+                            <div class="text-center py-4">
+                                <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                                <h5 class="text-muted">Noch keine Einträge vorhanden</h5>
+                                <p class="text-muted">Beginnen Sie mit Ihrem ersten Aufmaß-Eintrag.</p>
+                                {% if current_user.role in ['mitarbeiter', 'bauleiter', 'admin'] %}
+                                <a href="{{ url_for('aufmass.eingabe') }}" class="btn btn-primary">
+                                    <i class="fas fa-plus"></i> Ersten Eintrag erstellen
+                                </a>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Sidebar Widgets -->
+                <div class="col-lg-4">
+                    <!-- Weekly Progress -->
+                    {% if current_user.role in ['bauleiter', 'admin'] %}
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h6 class="mb-0">
+                                <i class="fas fa-chart-line text-success"></i>
+                                Wochenfortschritt
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <small>Aufmaße diese Woche</small>
+                                    <small>{{ stats.aufmasse_this_week or 0 }}/{{ stats.target_per_week or 10 }}</small>
+                                </div>
+                                <div class="progress" style="height: 8px;">
+                                    <div class="progress-bar bg-primary" style="width: {{ ((stats.aufmasse_this_week or 0) / (stats.target_per_week or 10) * 100) | round }}%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <small>Exportierte Berichte</small>
+                                    <small>{{ stats.exported_this_week or 0 }}/{{ stats.planned_exports or 5 }}</small>
+                                </div>
+                                <div class="progress" style="height: 8px;">
+                                    <div class="progress-bar bg-success" style="width: {{ ((stats.exported_this_week or 0) / (stats.planned_exports or 5) * 100) | round }}%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="text-center">
+                                <small class="text-muted">KW {{ moment().format('W/YYYY') }}</small>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Pending Actions -->
+                    {% if current_user.role == 'admin' %}
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h6 class="mb-0">
+                                <i class="fas fa-exclamation-circle text-warning"></i>
+                                Ausstehende Aktionen
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            {% if pending_actions %}
+                            <div class="list-group list-group-flush">
+                                {% for action in pending_actions %}
+                                <div class="list-group-item px-0 py-2 border-0">
+                                    <div class="d-flex align-items-center">
+                                        <div class="flex-shrink-0 me-3">
+                                            {% if action.type == 'duplicate' %}
+                                                <i class="fas fa-copy text-warning"></i>
+                                            {% elif action.type == 'approval' %}
+                                                <i class="fas fa-check-circle text-info"></i>
+                                            {% else %}
+                                                <i class="fas fa-exclamation text-danger"></i>
+                                            {% endif %}
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <small class="fw-bold">{{ action.title }}</small><br>
+                                            <small class="text-muted">{{ action.description }}</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <div class="text-center mt-3">
+                                <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-warning btn-sm">
+                                    <i class="fas fa-cog"></i> Verwalten
+                                </a>
+                            </div>
+                            {% else %}
+                            <div class="text-center py-3">
+                                <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
+                                <p class="text-muted mb-0">Alles erledigt!</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Quick Stats Chart -->
+                    {% if current_user.role in ['bauleiter', 'admin'] %}
+                    <div class="card">
+                        <div class="card-header">
+                            <h6 class="mb-0">
+                                <i class="fas fa-chart-pie text-info"></i>
+                                Materialverteilung
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="materialChart" width="300" height="200"></canvas>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+<script>
+    // Update current time every minute
+    function updateTime() {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString('de-DE', { 
+            hour: '2-digit', 
+            minute: '2-digit' 
+        });
+        document.getElementById('currentTime').textContent = timeString;
+    }
+    
+    setInterval(updateTime, 60000);
+    
+    // Material Distribution Chart
+    {% if current_user.role in ['bauleiter', 'admin'] and material_stats %}
+    const ctx = document.getElementById('materialChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: {{ material_stats.labels | tojson }},
+            datasets: [{
+                data: {{ material_stats.data | tojson }},
+                backgroundColor: [
+                    '#2c5aa0',
+                    '#4a7bc8',
+                    '#10b981',
+                    '#f59e0b',
+                    '#ef4444',
+                    '#6b7280'
+                ],
+                borderWidth: 2,
+                borderColor: '#ffffff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 15,
+                        font: {
+                            size: 11
+                        }
+                    }
+                }
+            }
+        }
+    });
+    {% endif %}
+</script>
+{% endblock %}

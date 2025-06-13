@@ -1,0 +1,597 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Panel - Bautagebuch{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="text-primary mb-1">
+                        <i class="fas fa-cogs me-2"></i>Admin Panel
+                    </h2>
+                    <p class="text-muted">Systemverwaltung und Konfiguration</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-outline-primary" onclick="location.reload()">
+                        <i class="fas fa-sync-alt me-1"></i>Aktualisieren
+                    </button>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#systemInfoModal">
+                        <i class="fas fa-info-circle me-1"></i>System Info
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Benutzer Gesamt
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_users or 0 }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-users fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Aufmaß-Einträge
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_entries or 0 }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Materialien
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_materials or 0 }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-boxes fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Duplikate gefunden
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_duplicates or 0 }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-exclamation-triangle fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Tabs -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header">
+                    <ul class="nav nav-tabs card-header-tabs" id="adminTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="users-tab" data-bs-toggle="tab" data-bs-target="#users" type="button" role="tab">
+                                <i class="fas fa-users me-1"></i>Benutzerverwaltung
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="materials-tab" data-bs-toggle="tab" data-bs-target="#materials" type="button" role="tab">
+                                <i class="fas fa-boxes me-1"></i>Materialverwaltung
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="duplicates-tab" data-bs-toggle="tab" data-bs-target="#duplicates" type="button" role="tab">
+                                <i class="fas fa-copy me-1"></i>Duplikatsprüfung
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="settings-tab" data-bs-toggle="tab" data-bs-target="#settings" type="button" role="tab">
+                                <i class="fas fa-cog me-1"></i>Einstellungen
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-body">
+                    <div class="tab-content" id="adminTabsContent">
+                        <!-- Benutzerverwaltung -->
+                        <div class="tab-pane fade show active" id="users" role="tabpanel">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5>Benutzerverwaltung</h5>
+                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#userModal">
+                                    <i class="fas fa-plus me-1"></i>Benutzer hinzufügen
+                                </button>
+                            </div>
+                            
+                            <div class="table-responsive">
+                                <table class="table table-striped data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Benutzername</th>
+                                            <th>E-Mail</th>
+                                            <th>Rolle</th>
+                                            <th>Status</th>
+                                            <th>Erstellt</th>
+                                            <th>Aktionen</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for user in users %}
+                                        <tr>
+                                            <td>{{ user.id }}</td>
+                                            <td>{{ user.username }}</td>
+                                            <td>{{ user.email }}</td>
+                                            <td>
+                                                <span class="badge bg-{% if user.role == 'admin' %}danger{% elif user.role == 'bauleiter' %}warning{% else %}secondary{% endif %}">
+                                                    {{ user.role|title }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-{{ 'success' if user.is_active else 'secondary' }}">
+                                                    {{ 'Aktiv' if user.is_active else 'Inaktiv' }}
+                                                </span>
+                                            </td>
+                                            <td>{{ user.created_at.strftime('%d.%m.%Y') }}</td>
+                                            <td>
+                                                <div class="btn-group" role="group">
+                                                    <button type="button" class="btn btn-sm btn-outline-primary edit-user-btn" 
+                                                            data-user-id="{{ user.id }}" 
+                                                            data-bs-toggle="tooltip" title="Bearbeiten">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    {% if user.id != current_user.id %}
+                                                    <button type="button" class="btn btn-sm btn-outline-danger delete-user-btn" 
+                                                            data-user-id="{{ user.id }}"
+                                                            data-bs-toggle="tooltip" title="Löschen">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                    {% endif %}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Materialverwaltung -->
+                        <div class="tab-pane fade" id="materials" role="tabpanel">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5>Materialverwaltung</h5>
+                                <button type="button" class="btn btn-primary" id="addMaterialBtn">
+                                    <i class="fas fa-plus me-1"></i>Material hinzufügen
+                                </button>
+                            </div>
+                            
+                            <div class="table-responsive">
+                                <table class="table table-striped data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Name</th>
+                                            <th>Kategorie</th>
+                                            <th>Einheit</th>
+                                            <th>Erstellt</th>
+                                            <th>Aktionen</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for material in materials %}
+                                        <tr>
+                                            <td>{{ material.id }}</td>
+                                            <td>{{ material.name }}</td>
+                                            <td>{{ material.category or '-' }}</td>
+                                            <td>{{ material.unit or 'Stk' }}</td>
+                                            <td>{{ material.created_at.strftime('%d.%m.%Y') if material.created_at else '-' }}</td>
+                                            <td>
+                                                <div class="btn-group" role="group">
+                                                    <button type="button" class="btn btn-sm btn-outline-primary edit-material-btn" 
+                                                            data-material-id="{{ material.id }}" 
+                                                            data-material-name="{{ material.name }}"
+                                                            data-bs-toggle="tooltip" title="Bearbeiten">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-sm btn-outline-danger delete-material-btn" 
+                                                            data-material-id="{{ material.id }}"
+                                                            data-material-name="{{ material.name }}"
+                                                            data-bs-toggle="tooltip" title="Löschen">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Duplikatsprüfung -->
+                        <div class="tab-pane fade" id="duplicates" role="tabpanel">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5>Duplikatsprüfung</h5>
+                                <button type="button" class="btn btn-warning" onclick="runDuplicateCheck()">
+                                    <i class="fas fa-search me-1"></i>Duplikate suchen
+                                </button>
+                            </div>
+                            
+                            {% if duplicates %}
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                <strong>{{ duplicates|length }} verdächtige Duplikate gefunden!</strong>
+                                Bitte prüfen Sie die folgenden Einträge.
+                            </div>
+                            
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Datum</th>
+                                            <th>Ort</th>
+                                            <th>Material</th>
+                                            <th>Menge</th>
+                                            <th>Mitarbeiter</th>
+                                            <th>Ähnlichkeit</th>
+                                            <th>Aktionen</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for duplicate in duplicates %}
+                                        <tr>
+                                            <td>{{ duplicate.datum.strftime('%d.%m.%Y') }}</td>
+                                            <td>{{ duplicate.ort }}</td>
+                                            <td>{{ duplicate.material }}</td>
+                                            <td>{{ duplicate.menge }}</td>
+                                            <td>{{ duplicate.mitarbeiter }}</td>
+                                            <td>
+                                                <span class="badge bg-{{ 'danger' if duplicate.similarity > 90 else 'warning' if duplicate.similarity > 70 else 'info' }}">
+                                                    {{ duplicate.similarity }}%
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <div class="btn-group" role="group">
+                                                    <button type="button" class="btn btn-sm btn-success" 
+                                                            onclick="markAsValid({{ duplicate.id }})"
+                                                            data-bs-toggle="tooltip" title="Als gültig markieren">
+                                                        <i class="fas fa-check"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-sm btn-danger" 
+                                                            onclick="deleteDuplicate({{ duplicate.id }})"
+                                                            data-bs-toggle="tooltip" title="Löschen">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% else %}
+                            <div class="alert alert-success">
+                                <i class="fas fa-check-circle me-2"></i>
+                                <strong>Keine Duplikate gefunden!</strong>
+                                Alle Einträge sind eindeutig.
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Einstellungen -->
+                        <div class="tab-pane fade" id="settings" role="tabpanel">
+                            <h5 class="mb-4">Systemeinstellungen</h5>
+                            
+                            <form method="POST" action="{{ url_for('admin.update_settings') }}" class="needs-validation" novalidate>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h6 class="mb-0">Allgemeine Einstellungen</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="mb-3">
+                                                    <label for="app_title" class="form-label">App-Titel</label>
+                                                    <input type="text" class="form-control" id="app_title" name="app_title" 
+                                                           value="{{ settings.app_title or 'Bautagebuch' }}" required>
+                                                </div>
+                                                
+                                                <div class="mb-3">
+                                                    <label for="company_name" class="form-label">Firmenname</label>
+                                                    <input type="text" class="form-control" id="company_name" name="company_name" 
+                                                           value="{{ settings.company_name or 'Borrmann Professionals' }}" required>
+                                                </div>
+                                                
+                                                <div class="mb-3">
+                                                    <label for="entries_per_page" class="form-label">Einträge pro Seite</label>
+                                                    <select class="form-select" id="entries_per_page" name="entries_per_page">
+                                                        <option value="10" {{ 'selected' if settings.entries_per_page == 10 }}>10</option>
+                                                        <option value="25" {{ 'selected' if settings.entries_per_page == 25 }}>25</option>
+                                                        <option value="50" {{ 'selected' if settings.entries_per_page == 50 }}>50</option>
+                                                        <option value="100" {{ 'selected' if settings.entries_per_page == 100 }}>100</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h6 class="mb-0">Sicherheitseinstellungen</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="mb-3">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="auto_logout" name="auto_logout" 
+                                                               {{ 'checked' if settings.auto_logout }}>
+                                                        <label class="form-check-label" for="auto_logout">
+                                                            Automatisches Logout nach Inaktivität
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="mb-3">
+                                                    <label for="session_timeout" class="form-label">Session-Timeout (Minuten)</label>
+                                                    <input type="number" class="form-control" id="session_timeout" name="session_timeout" 
+                                                           value="{{ settings.session_timeout or 30 }}" min="5" max="480">
+                                                </div>
+                                                
+                                                <div class="mb-3">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="duplicate_check" name="duplicate_check" 
+                                                               {{ 'checked' if settings.duplicate_check }}>
+                                                        <label class="form-check-label" for="duplicate_check">
+                                                            Automatische Duplikatsprüfung
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row mt-4">
+                                    <div class="col-12">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-save me-1"></i>Einstellungen speichern
+                                        </button>
+                                        <button type="button" class="btn btn-outline-secondary ms-2" onclick="location.reload()">
+                                            <i class="fas fa-undo me-1"></i>Zurücksetzen
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modals -->
+<!-- User Modal -->
+<div class="modal fade" id="userModal" tabindex="-1" aria-labelledby="userModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="userModalLabel">Benutzer hinzufügen</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{{ url_for('admin.manage_user') }}" class="needs-validation" novalidate>
+                <div class="modal-body">
+                    <input type="hidden" id="userId" name="user_id">
+                    
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Benutzername</label>
+                        <input type="text" class="form-control" id="username" name="username" required>
+                        <div class="invalid-feedback">Bitte geben Sie einen Benutzernamen ein.</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="email" class="form-label">E-Mail</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                        <div class="invalid-feedback">Bitte geben Sie eine gültige E-Mail-Adresse ein.</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Passwort</label>
+                        <input type="password" class="form-control" id="password" name="password">
+                        <div class="form-text">Lassen Sie das Feld leer, um das Passwort unverändert zu lassen.</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="role" class="form-label">Rolle</label>
+                        <select class="form-select" id="role" name="role" required>
+                            <option value="">Bitte wählen...</option>
+                            <option value="mitarbeiter">Mitarbeiter</option>
+                            <option value="bauleiter">Bauleiter</option>
+                            <option value="admin">Administrator</option>
+                        </select>
+                        <div class="invalid-feedback">Bitte wählen Sie eine Rolle aus.</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
+                    <button type="submit" class="btn btn-primary">Speichern</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Material Modal -->
+<div class="modal fade" id="materialModal" tabindex="-1" aria-labelledby="materialModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="materialModalTitle">Material hinzufügen</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{{ url_for('admin.manage_material') }}" class="needs-validation" novalidate>
+                <div class="modal-body">
+                    <input type="hidden" id="materialId" name="material_id">
+                    
+                    <div class="mb-3">
+                        <label for="materialName" class="form-label">Materialname</label>
+                        <input type="text" class="form-control" id="materialName" name="name" required>
+                        <div class="invalid-feedback">Bitte geben Sie einen Materialnamen ein.</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="materialCategory" class="form-label">Kategorie</label>
+                        <input type="text" class="form-control" id="materialCategory" name="category" 
+                               placeholder="z.B. Beton, Stahl, Holz">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="materialUnit" class="form-label">Einheit</label>
+                        <select class="form-select" id="materialUnit" name="unit">
+                            <option value="Stk">Stück</option>
+                            <option value="m">Meter</option>
+                            <option value="m²">Quadratmeter</option>
+                            <option value="m³">Kubikmeter</option>
+                            <option value="kg">Kilogramm</option>
+                            <option value="t">Tonnen</option>
+                            <option value="l">Liter</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
+                    <button type="submit" class="btn btn-primary">Speichern</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- System Info Modal -->
+<div class="modal fade" id="systemInfoModal" tabindex="-1" aria-labelledby="systemInfoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="systemInfoModalLabel">System Information</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Anwendung</h6>
+                        <table class="table table-sm">
+                            <tr><td>Version:</td><td>1.0.0</td></tr>
+                            <tr><td>Framework:</td><td>Flask 2.3</td></tr>
+                            <tr><td>Python:</td><td>{{ python_version }}</td></tr>
+                            <tr><td>Umgebung:</td><td>{{ environment }}</td></tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Datenbank</h6>
+                        <table class="table table-sm">
+                            <tr><td>Typ:</td><td>{{ db_type }}</td></tr>
+                            <tr><td>Größe:</td><td>{{ db_size }}</td></tr>
+                            <tr><td>Tabellen:</td><td>{{ db_tables }}</td></tr>
+                            <tr><td>Verbindungen:</td><td>{{ db_connections }}</td></tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Schließen</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Duplicate Check Functions
+async function runDuplicateCheck() {
+    showNotification('Duplikatsprüfung läuft...', 'info');
+    
+    try {
+        const response = await apiRequest('/admin/check-duplicates', {
+            method: 'POST'
+        });
+        
+        if (response.ok) {
+            showNotification('Duplikatsprüfung abgeschlossen', 'success');
+            location.reload();
+        } else {
+            throw new Error('Fehler bei der Duplikatsprüfung');
+        }
+    } catch (error) {
+        showNotification('Fehler bei der Duplikatsprüfung', 'error');
+    }
+}
+
+async function markAsValid(id) {
+    try {
+        const response = await apiRequest(`/admin/duplicates/${id}/mark-valid`, {
+            method: 'POST'
+        });
+        
+        if (response.ok) {
+            showNotification('Als gültig markiert', 'success');
+            location.reload();
+        }
+    } catch (error) {
+        showNotification('Fehler beim Markieren', 'error');
+    }
+}
+
+async function deleteDuplicate(id) {
+    if (confirm('Möchten Sie diesen Eintrag wirklich löschen?')) {
+        try {
+            const response = await apiRequest(`/admin/duplicates/${id}`, {
+                method: 'DELETE'
+            });
+            
+            if (response.ok) {
+                showNotification('Eintrag gelöscht', 'success');
+                location.reload();
+            }
+        } catch (error) {
+            showNotification('Fehler beim Löschen', 'error');
+        }
+    }
+}
+</script>
+{% endblock %}

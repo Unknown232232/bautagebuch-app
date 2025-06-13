@@ -1,0 +1,302 @@
+{% extends "base.html" %}
+
+{% block title %}Duplikate-Übersicht - Bautagebuch{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <!-- Header -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="bg-gradient-to-r from-yellow-600 to-yellow-700 rounded-lg p-2">
+                    <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900">Duplikate-Prüfung</h1>
+                    <p class="text-gray-600">Potentielle Duplikate in Aufmaß-Einträgen</p>
+                </div>
+            </div>
+            <div class="flex space-x-3">
+                <a href="{{ url_for('aufmass.liste') }}" 
+                   class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-200">
+                    <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                    </svg>
+                    Zur Aufmaß-Liste
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div class="bg-red-50 rounded-lg p-4">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <svg class="h-8 w-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-red-900">Hohes Risiko</p>
+                    <p class="text-2xl font-bold text-red-600">{{ stats.hohes_risiko }}</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-yellow-50 rounded-lg p-4">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <svg class="h-8 w-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-yellow-900">Mittleres Risiko</p>
+                    <p class="text-2xl font-bold text-yellow-600">{{ stats.mittleres_risiko }}</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-blue-50 rounded-lg p-4">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <svg class="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-blue-900">Niedriges Risiko</p>
+                    <p class="text-2xl font-bold text-blue-600">{{ stats.niedriges_risiko }}</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-gray-50 rounded-lg p-4">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <svg class="h-8 w-8 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-900">Gesamt Duplikate</p>
+                    <p class="text-2xl font-bold text-gray-600">{{ stats.gesamt_duplikate }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="mb-6 p-4 rounded-lg border-l-4 {{ 'border-red-500 bg-red-50' if category == 'error' else 'border-green-500 bg-green-50' }}">
+                    <div class="flex items-center">
+                        <svg class="h-5 w-5 mr-2 {{ 'text-red-400' if category == 'error' else 'text-green-400' }}" fill="currentColor" viewBox="0 0 20 20">
+                            {% if category == 'error' %}
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                            {% else %}
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            {% endif %}
+                        </svg>
+                        <span class="{{ 'text-red-700' if category == 'error' else 'text-green-700' }}">{{ message }}</span>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Duplicates List -->
+    {% if duplikate %}
+        <div class="space-y-6">
+            {% for duplikat in duplikate %}
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                    <!-- Header with Risk Level -->
+                    <div class="px-6 py-4 border-b border-gray-200 {{ 'bg-red-50' if duplikat.risiko == 3 else 'bg-yellow-50' if duplikat.risiko == 2 else 'bg-blue-50' }}">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <div class="flex-shrink-0">
+                                    {% if duplikat.risiko == 3 %}
+                                        <div class="h-8 w-8 bg-red-100 rounded-full flex items-center justify-center">
+                                            <svg class="h-5 w-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                                            </svg>
+                                        </div>
+                                    {% elif duplikat.risiko == 2 %}
+                                        <div class="h-8 w-8 bg-yellow-100 rounded-full flex items-center justify-center">
+                                            <svg class="h-5 w-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            </svg>
+                                        </div>
+                                    {% else %}
+                                        <div class="h-8 w-8 bg-blue-100 rounded-full flex items-center justify-center">
+                                            <svg class="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            </svg>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-medium {{ 'text-red-900' if duplikat.risiko == 3 else 'text-yellow-900' if duplikat.risiko == 2 else 'text-blue-900' }}">
+                                        {{ 'Hohes Risiko' if duplikat.risiko == 3 else 'Mittleres Risiko' if duplikat.risiko == 2 else 'Niedriges Risiko' }}
+                                    </h3>
+                                    <p class="text-sm {{ 'text-red-700' if duplikat.risiko == 3 else 'text-yellow-700' if duplikat.risiko == 2 else 'text-blue-700' }}">
+                                        {{ duplikat.aehnliche|length + 1 }} ähnliche Einträge gefunden
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="flex space-x-2">
+                                <!-- Criteria Badges -->
+                                {% if duplikat.kriterien.gleicher_tag %}
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                        Gleicher Tag
+                                    </span>
+                                {% endif %}
+                                {% if duplikat.kriterien.gleicher_ort %}
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+                                        Gleicher Ort
+                                    </span>
+                                {% endif %}
+                                {% if duplikat.kriterien.gleiches_material %}
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                        Gleiches Material
+                                    </span>
+                                {% endif %}
+                                {% if duplikat.kriterien.gleicher_mitarbeiter %}
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                        Gleicher Mitarbeiter
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Main Entry -->
+                    <div class="p-6">
+                        <div class="mb-4">
+                            <h4 class="text-md font-semibold text-gray-900 mb-2">Haupteintrag:</h4>
+                            <div class="bg-gray-50 rounded-lg p-4">
+                                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
+                                    <div>
+                                        <span class="font-medium text-gray-700">Material:</span>
+                                        <p class="text-gray-900">{{ duplikat.haupteintrag.material.name }}</p>
+                                    </div>
+                                    <div>
+                                        <span class="font-medium text-gray-700">Ort:</span>
+                                        <p class="text-gray-900">{{ duplikat.haupteintrag.ort }}</p>
+                                    </div>
+                                    <div>
+                                        <span class="font-medium text-gray-700">Menge:</span>
+                                        <p class="text-gray-900">{{ duplikat.haupteintrag.menge }} {{ duplikat.haupteintrag.einheit or duplikat.haupteintrag.material.einheit }}</p>
+                                    </div>
+                                    <div>
+                                        <span class="font-medium text-gray-700">Datum:</span>
+                                        <p class="text-gray-900">{{ duplikat.haupteintrag.datum.strftime('%d.%m.%Y') }}</p>
+                                    </div>
+                                </div>
+                                <div class="mt-2 flex items-center justify-between">
+                                    <span class="text-xs text-gray-500">
+                                        ID: {{ duplikat.haupteintrag.id }} • 
+                                        Mitarbeiter: {{ duplikat.haupteintrag.mitarbeiter.username }}
+                                    </span>
+                                    <div class="flex space-x-2">
+                                        <form method="POST" action="{{ url_for('duplikate.duplikat_markieren_ok', aufmass_id=duplikat.haupteintrag.id) }}" class="inline">
+                                            <button type="submit" class="text-xs px-2 py-1 bg-green-100 text-green-800 rounded hover:bg-green-200 transition duration-200">
+                                                Als OK markieren
+                                            </button>
+                                        </form>
+                                        {% if current_user.is_admin() %}
+                                            <form method="POST" action="{{ url_for('duplikate.duplikat_loeschen', aufmass_id=duplikat.haupteintrag.id) }}" 
+                                                  onsubmit="return confirm('Sind Sie sicher, dass Sie diesen Eintrag löschen möchten?')" class="inline">
+                                                <button type="submit" class="text-xs px-2 py-1 bg-red-100 text-red-800 rounded hover:bg-red-200 transition duration-200">
+                                                    Löschen
+                                                </button>
+                                            </form>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Similar Entries -->
+                        <div>
+                            <h4 class="text-md font-semibold text-gray-900 mb-2">Ähnliche Einträge:</h4>
+                            <div class="space-y-2">
+                                {% for aehnlich in duplikat.aehnliche %}
+                                    <div class="bg-yellow-50 rounded-lg p-4 border border-yellow-200">
+                                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
+                                            <div>
+                                                <span class="font-medium text-gray-700">Material:</span>
+                                                <p class="text-gray-900">{{ aehnlich.aufmass.material.name }}</p>
+                                            </div>
+                                            <div>
+                                                <span class="font-medium text-gray-700">Ort:</span>
+                                                <p class="text-gray-900">{{ aehnlich.aufmass.ort }}</p>
+                                            </div>
+                                            <div>
+                                                <span class="font-medium text-gray-700">Menge:</span>
+                                                <p class="text-gray-900">{{ aehnlich.aufmass.menge }} {{ aehnlich.aufmass.einheit or aehnlich.aufmass.material.einheit }}</p>
+                                            </div>
+                                            <div>
+                                                <span class="font-medium text-gray-700">Datum:</span>
+                                                <p class="text-gray-900">{{ aehnlich.aufmass.datum.strftime('%d.%m.%Y') }}</p>
+                                            </div>
+                                        </div>
+                                        <div class="mt-2 flex items-center justify-between">
+                                            <div class="flex items-center space-x-4">
+                                                <span class="text-xs text-gray-500">
+                                                    ID: {{ aehnlich.aufmass.id }} • 
+                                                    Mitarbeiter: {{ aehnlich.aufmass.mitarbeiter.username }}
+                                                </span>
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                                                    {{ "%.0f"|format(aehnlich.aehnlichkeit * 100) }}% Ähnlichkeit
+                                                </span>
+                                            </div>
+                                            <div class="flex space-x-2">
+                                                <form method="POST" action="{{ url_for('duplikate.duplikat_markieren_ok', aufmass_id=aehnlich.aufmass.id) }}" class="inline">
+                                                    <button type="submit" class="text-xs px-2 py-1 bg-green-100 text-green-800 rounded hover:bg-green-200 transition duration-200">
+                                                        Als OK markieren
+                                                    </button>
+                                                </form>
+                                                {% if current_user.is_admin() %}
+                                                    <form method="POST" action="{{ url_for('duplikate.duplikat_loeschen', aufmass_id=aehnlich.aufmass.id) }}" 
+                                                          onsubmit="return confirm('Sind Sie sicher, dass Sie diesen Eintrag löschen möchten?')" class="inline">
+                                                        <button type="submit" class="text-xs px-2 py-1 bg-red-100 text-red-800 rounded hover:bg-red-200 transition duration-200">
+                                                            Löschen
+                                                        </button>
+                                                    </form>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <!-- No Duplicates Found -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
+            <svg class="mx-auto h-12 w-12 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <h3 class="mt-2 text-lg font-medium text-gray-900">Keine Duplikate gefunden</h3>
+            <p class="mt-1 text-gray-500">Alle Aufmaß-Einträge scheinen eindeutig zu sein.</p>
+            <div class="mt-6">
+                <a href="{{ url_for('aufmass.liste') }}" 
+                   class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-200">
+                    <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                    </svg>
+                    Zur Aufmaß-Übersicht
+                </a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

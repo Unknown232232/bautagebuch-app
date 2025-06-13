@@ -1,0 +1,130 @@
+C:\USERS\DENNI\DESKTOP\BAUTAGEBUCH-APP
+¦   .env
+¦   bautagebuch.db
+¦   requirements.txt
+¦   run.py
+¦   verzeichnis.txt
+¦
+¦
+¦
++---app
+¦   ¦   __init__.py
+¦   ¦
+¦   +---forms
+¦   ¦   ¦   aufmass_forms.py
+¦   ¦   ¦   auth.py
+¦   ¦   ¦   material_forms.py
+¦   ¦   ¦   __init__.py
+¦   ¦   ¦
+¦   ¦   +---__pycache__
+¦   ¦           aufmass_forms.cpython-312.pyc
+¦   ¦           auth.cpython-312.pyc
+¦   ¦           material_forms.cpython-312.pyc
+¦   ¦           __init__.cpython-312.pyc
+¦   ¦
+¦   +---models
+¦   ¦   ¦   aufmass.py
+¦   ¦   ¦   bautagebuch.py
+¦   ¦   ¦   material.py
+¦   ¦   ¦   user.py
+¦   ¦   ¦   __init__.py
+¦   ¦   ¦
+¦   ¦   +---__pycache__
+¦   ¦           aufmass.cpython-312.pyc
+¦   ¦           bautagebuch.cpython-312.pyc
+¦   ¦           material.cpython-312.pyc
+¦   ¦           user.cpython-312.pyc
+¦   ¦           __init__.cpython-312.pyc
+¦   ¦
+¦   +---routes
+¦   ¦   ¦   admin.py
+¦   ¦   ¦   aufmass.py
+¦   ¦   ¦   auth.py
+¦   ¦   ¦   dashboard.py
+¦   ¦   ¦   duplikate.py
+¦   ¦   ¦   wochenbericht.py
+¦   ¦   ¦   __init__.py
+¦   ¦   ¦
+¦   ¦   +---__pycache__
+¦   ¦           admin.cpython-312.pyc
+¦   ¦           aufmass.cpython-312.pyc
+¦   ¦           auth.cpython-312.pyc
+¦   ¦           dashboard.cpython-312.pyc
+¦   ¦           duplikate.cpython-312.pyc
+¦   ¦           wochenbericht.cpython-312.pyc
+¦   ¦           __init__.cpython-312.pyc
+¦   ¦
+¦   +---static
+¦   ¦   +---css
+¦   ¦   ¦       main.css
+¦   ¦   ¦       style.css
+¦   ¦   ¦
+¦   ¦   +---images
+¦   ¦   ¦       favicon.ico
+¦   ¦   ¦       logo.png
+¦   ¦   ¦
+¦   ¦   +---js
+¦   ¦           app.js
+¦   ¦           app_javascript.js
+¦   ¦           main.js
+¦   ¦
+¦   +---templates
+¦   ¦   ¦   admin_panel.html
+¦   ¦   ¦   base.html
+¦   ¦   ¦   impressum.html
+¦   ¦   ¦
+¦   ¦   +---admin
+¦   ¦   ¦       bulk_material_form.html
+¦   ¦   ¦       dashboard.html
+¦   ¦   ¦       materials.html
+¦   ¦   ¦       material_form.html
+¦   ¦   ¦
+¦   ¦   +---aufmass
+¦   ¦   ¦       eingabe.html
+¦   ¦   ¦       liste.html
+¦   ¦   ¦       uebersicht.html
+¦   ¦   ¦
+¦   ¦   +---auth
+¦   ¦   ¦       login - Kopie.html
+¦   ¦   ¦       login.html
+¦   ¦   ¦       register.html
+¦   ¦   ¦
+¦   ¦   +---components
+¦   ¦   ¦       filter.html
+¦   ¦   ¦
+¦   ¦   +---dashboard
+¦   ¦   ¦       admin.html
+¦   ¦   ¦       bauleiter.html
+¦   ¦   ¦       mitarbeiter.html
+¦   ¦   ¦
+¦   ¦   +---main
+¦   ¦   ¦       dashboard.html
+¦   ¦   ¦
+¦   ¦   +---reports
+¦   ¦   ¦       wochenbericht.html
+¦   ¦   ¦
+¦   ¦   +---wochenbericht
+¦   ¦           anzeigen.html
+¦   ¦           uebersicht.html
+¦   ¦
+¦   +---utils
+¦   ¦   ¦   decorators.py
+¦   ¦   ¦   file_utils.py
+¦   ¦   ¦
+¦   ¦   +---__pycache__
+¦   ¦           decorators.cpython-312.pyc
+¦   ¦           file_utils.cpython-312.pyc
+¦   ¦
+¦   +---__pycache__
+¦           __init__.cpython-312.pyc
+¦
++---instance
+¦   ¦   bautagebuch.db
+¦   ¦   config.py
+¦   ¦
+¦   +---uploads
++---migrations
++---tests
+        test_aufmass.py
+        test_auth.py
+        __init__.py

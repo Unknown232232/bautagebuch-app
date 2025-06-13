@@ -1,0 +1,235 @@
+{% extends "base.html" %}
+
+{% block title %}Aufmaß bearbeiten - {{ aufmass.material.name }} - Bautagebuch{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <!-- Header -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="bg-gradient-to-r from-orange-600 to-orange-700 rounded-lg p-2">
+                    <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900">Aufmaß bearbeiten</h1>
+                    <p class="text-gray-600">ID: {{ aufmass.id }} • Erstellt: {{ aufmass.created_at.strftime('%d.%m.%Y') }}</p>
+                </div>
+            </div>
+            <div class="flex space-x-3">
+                <a href="{{ url_for('aufmass.details', id=aufmass.id) }}" 
+                   class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-200">
+                    <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                    </svg>
+                    Zurück zu Details
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="mb-6 p-4 rounded-lg border-l-4 {{ 'border-red-500 bg-red-50' if category == 'error' else 'border-green-500 bg-green-50' }}">
+                    <div class="flex items-center">
+                        <svg class="h-5 w-5 mr-2 {{ 'text-red-400' if category == 'error' else 'text-green-400' }}" fill="currentColor" viewBox="0 0 20 20">
+                            {% if category == 'error' %}
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                            {% else %}
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            {% endif %}
+                        </svg>
+                        <span class="{{ 'text-red-700' if category == 'error' else 'text-green-700' }}">{{ message }}</span>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Edit Form -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+        <form method="POST" id="editForm">
+            {{ form.hidden_tag() }}
+            
+            <!-- Material Section -->
+            <div class="mb-8 p-6 bg-gray-50 rounded-lg border-l-4 border-orange-500">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                    <svg class="inline h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
+                    </svg>
+                    Material & Leistung
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Material/Leistung *</label>
+                        {{ form.material_id(class="form-select w-full") }}
+                        {% for error in form.material_id.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Einheit (optional)</label>
+                        {{ form.einheit(class="form-control w-full", placeholder="z.B. m², Stk, lfdm") }}
+                        {% for error in form.einheit.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Location Section -->
+            <div class="mb-8 p-6 bg-gray-50 rounded-lg border-l-4 border-green-500">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                    <svg class="inline h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                    Ort & Position
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Ort *</label>
+                        {{ form.ort(class="form-control w-full", placeholder="z.B. Raum 101, EG Links, Keller") }}
+                        {% for error in form.ort.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Raumnummer (optional)</label>
+                        {{ form.raumnummer(class="form-control w-full", placeholder="z.B. R001, Büro 1") }}
+                        {% for error in form.raumnummer.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quantity Section -->
+            <div class="mb-8 p-6 bg-gray-50 rounded-lg border-l-4 border-blue-500">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                    <svg class="inline h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM7 3H5a2 2 0 00-2 2v12a4 4 0 004 4h2M9 3h10a2 2 0 012 2v12a4 4 0 01-2 2H9M9 3v18"></path>
+                    </svg>
+                    Menge & Datum
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Menge *</label>
+                        {{ form.menge(class="form-control w-full", step="0.01", min="0.01") }}
+                        {% for error in form.menge.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Datum *</label>
+                        {{ form.datum(class="form-control w-full") }}
+                        {% for error in form.datum.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Additional Information -->
+            <div class="mb-8 p-6 bg-gray-50 rounded-lg border-l-4 border-purple-500">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                    <svg class="inline h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path>
+                    </svg>
+                    Zusätzliche Informationen
+                </h3>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Bemerkungen (optional)</label>
+                    {{ form.bemerkungen(class="form-control w-full", rows="4", placeholder="Zusätzliche Informationen...") }}
+                    {% for error in form.bemerkungen.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Metadata Display -->
+            <div class="mb-8 p-6 bg-blue-50 rounded-lg border border-blue-200">
+                <h3 class="text-lg font-semibold text-blue-900 mb-4">
+                    <svg class="inline h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    Metadaten
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                    <div>
+                        <span class="font-medium text-blue-800">Erstellt von:</span>
+                        <p class="text-blue-700">{{ aufmass.mitarbeiter.username }}</p>
+                    </div>
+                    <div>
+                        <span class="font-medium text-blue-800">Erstellt am:</span>
+                        <p class="text-blue-700">{{ aufmass.created_at.strftime('%d.%m.%Y %H:%M') }}</p>
+                    </div>
+                    {% if aufmass.updated_at != aufmass.created_at %}
+                        <div>
+                            <span class="font-medium text-blue-800">Zuletzt geändert:</span>
+                            <p class="text-blue-700">{{ aufmass.updated_at.strftime('%d.%m.%Y %H:%M') }}</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex items-center justify-between pt-6 border-t border-gray-200">
+                <a href="{{ url_for('aufmass.details', id=aufmass.id) }}" 
+                   class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-200">
+                    <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                    Abbrechen
+                </a>
+                
+                <div class="flex space-x-3">
+                    <button type="button" onclick="resetForm()" 
+                            class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition duration-200">
+                        <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
+                        Zurücksetzen
+                    </button>
+                    
+                    <button type="submit" 
+                            class="inline-flex items-center px-6 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition duration-200">
+                        <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        Änderungen speichern
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('editForm');
+    
+    // Form-Validierung vor Submit
+    form.addEventListener('submit', function(e) {
+        const mengeField = document.getElementById('menge');
+        if (parseFloat(mengeField.value) <= 0) {
+            e.preventDefault();
+            alert('Die Menge muss größer als 0 sein!');
+            mengeField.focus();
+            return false;
+        }
+    });
+});
+
+// Form reset function
+function resetForm() {
+    if (confirm('Möchten Sie alle Änderungen verwerfen und das Formular zurücksetzen?')) {
+        document.getElementById('editForm').reset();
+    }
+}
+</script>
+{% endblock %}

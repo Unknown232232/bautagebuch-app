@@ -21,7 +21,7 @@ class Material(db.Model):
     updated_by = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
 
     # Beziehungen - KORRIGIERT mit back_populates
-    creator = db.relationship('User', foreign_keys=[created_by], backref='erstellt_materialien')
+    creator = db.relationship('User', foreign_keys=[created_by])
     updater = db.relationship('User', foreign_keys=[updated_by])
     aufmass_entries = db.relationship('AufmassEntry', back_populates='material', lazy='dynamic')
 

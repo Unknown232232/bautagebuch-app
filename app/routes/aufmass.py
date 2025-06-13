@@ -76,7 +76,8 @@ def eingabe():
                             filename=unique_filename,
                             original_filename=original_filename,
                             file_type=file.content_type or 'unknown',
-                            file_size=os.path.getsize(file_path)
+                            file_size=os.path.getsize(file_path),
+                            uploaded_by=current_user.id
                         )
                         db.session.add(document)
 

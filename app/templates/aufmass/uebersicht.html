@@ -1,11 +1,22 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="de" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aufmaß-Übersicht – Bautagebuch</title>
-    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Custom CSS -->
+    <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
     <script>
         window.onload = () => {
             lucide.createIcons();
@@ -13,6 +24,17 @@
     </script>
 </head>
 <body class="bg-gray-50 min-h-screen">
+
+    <!-- Dark Mode Toggle -->
+    <div class="fixed top-4 right-4 z-50">
+        <button class="theme-toggle bg-white dark:bg-gray-800 p-2 rounded-full shadow-lg border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-200" 
+                aria-label="Theme umschalten" 
+                title="Zwischen Light und Dark Mode wechseln">
+            <div class="theme-toggle-slider">
+                <i data-lucide="sun" class="w-5 h-5 text-gray-600 dark:text-gray-300"></i>
+            </div>
+        </button>
+    </div>
     <!-- Navigation -->
     <nav class="bg-white shadow-sm border-b border-gray-200">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -289,5 +311,8 @@
             </div>
         </div>
     </div>
+
+    <!-- Dark Mode JavaScript -->
+    <script src="{{ url_for('static', filename='js/darkmode.js') }}"></script>
 </body>
 </html>

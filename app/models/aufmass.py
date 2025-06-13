@@ -108,9 +108,15 @@ class AufmassEntry(db.Model):
         """Generiert automatischen Bautagebuch-Eintrag"""
         datum_str = self.datum.strftime('%d.%m.%Y')
         raum_text = f" (Raum {self.raumnummer})" if self.raumnummer else ""
-        return (f"Am {datum_str} führte {self.mitarbeiter.username} "
+        
+        # Sicherstellen, dass Beziehungen geladen sind
+        mitarbeiter_name = self.mitarbeiter.username if self.mitarbeiter else 'Unbekannt'
+        material_name = self.material.name if self.material else 'Unbekannt'
+        material_einheit = self.material.einheit if self.material else ''
+        
+        return (f"Am {datum_str} führte {mitarbeiter_name} "
                 f"in {self.ort}{raum_text} folgende Leistung aus: "
-                f"{self.material.name}, Menge: {self.menge} {self.einheit or self.material.einheit or ''}. "
+                f"{material_name}, Menge: {self.menge} {self.einheit or material_einheit or ''}. "
                 f"{'Bemerkungen: ' + self.bemerkungen if self.bemerkungen else ''}")
 
     def validate(self):

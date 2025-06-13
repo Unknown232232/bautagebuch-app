@@ -464,8 +464,8 @@ class TestRelationships:
         assert entry.material == sample_material
         
         # Test backward relationship
-        assert len(sample_material.aufmass_entries) == 1
-        assert sample_material.aufmass_entries[0] == entry
+        assert sample_material.aufmass_entries.count() == 1
+        assert sample_material.aufmass_entries.first() == entry
     
     def test_aufmass_document_relationship(self, app, sample_user, sample_material):
         """Test aufmass-document relationship."""

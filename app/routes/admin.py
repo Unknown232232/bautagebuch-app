@@ -5,7 +5,7 @@ from sqlalchemy import or_
 from app import db
 from app.models.material import Material  # Fixed import path
 from app.models.user import User  # Fixed import path
-from app.forms.aufmass_forms import MaterialForm, SearchFilterForm  # Fixed import path
+from app.forms.material_forms import MaterialForm, BulkMaterialForm, MaterialSearchForm  # Fixed import path
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 
@@ -52,7 +52,7 @@ def dashboard():
 @admin_required
 def materials():
     """Materialverwaltung - Übersicht"""
-    form = SearchFilterForm()
+    form = MaterialSearchForm()
 
     # Query aufbauen
     query = Material.query

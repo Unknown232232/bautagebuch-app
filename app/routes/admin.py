@@ -1,3 +1,4 @@
+import logging
 from flask import Blueprint, render_template, request, flash, redirect, url_for, jsonify
 from flask_login import login_required, current_user
 from functools import wraps
@@ -6,6 +7,8 @@ from app import db
 from app.models.material import Material  # Fixed import path
 from app.models.user import User  # Fixed import path
 from app.forms.material_forms import MaterialForm, BulkMaterialForm, MaterialSearchForm  # Fixed import path
+
+logger = logging.getLogger(__name__)
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 
@@ -104,6 +107,7 @@ def add_material():
             return redirect(url_for('admin.materials'))
         except Exception as e:
             db.session.rollback()
+            logger.error(f"Error adding material {form.name.data}: {e}")
             flash('Fehler beim Speichern des Materials.', 'error')
 
     return render_template('admin/material_form.html', form=form, title='Material hinzufügen')
@@ -130,6 +134,7 @@ def edit_material(id):
             return redirect(url_for('admin.materials'))
         except Exception as e:
             db.session.rollback()
+            logger.error(f"Error updating material {material.name}: {e}")
             flash('Fehler beim Aktualisieren des Materials.', 'error')
 
     return render_template('admin/material_form.html',
@@ -157,6 +162,7 @@ def delete_material(id):
         flash(f'Material "{material.name}" wurde erfolgreich gelöscht.', 'success')
     except Exception as e:
         db.session.rollback()
+        logger.error(f"Error deleting material {material.name}: {e}")
         flash('Fehler beim Löschen des Materials.', 'error')
 
     return redirect(url_for('admin.materials'))
@@ -213,6 +219,7 @@ def bulk_add_materials():
             return redirect(url_for('admin.materials'))
         except Exception as e:
             db.session.rollback()
+            logger.error(f"Error bulk adding materials: {e}")
             flash('Fehler beim Speichern der Materialien.', 'error')
 
     return render_template('admin/bulk_material_form.html')
@@ -232,6 +239,7 @@ def toggle_material_status(id):
         flash(f'Material "{material.name}" wurde {status}.', 'success')
     except Exception as e:
         db.session.rollback()
+        logger.error(f"Error toggling material status for {material.name}: {e}")
         flash('Fehler beim Ändern des Material-Status.', 'error')
 
     return redirect(url_for('admin.materials'))

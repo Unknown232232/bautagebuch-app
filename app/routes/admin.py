@@ -5,7 +5,7 @@ from sqlalchemy import or_
 from app import db
 from app.models.material import Material  # Fixed import path
 from app.models.user import User  # Fixed import path
-from app.forms.material_forms import MaterialForm, BulkMaterialForm, MaterialSearchForm  # Fixed import path
+from app.forms.aufmass_forms import MaterialForm, SearchFilterForm  # Fixed import path
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 
@@ -52,7 +52,7 @@ def dashboard():
 @admin_required
 def materials():
     """Materialverwaltung - Übersicht"""
-    form = MaterialSearchForm()
+    form = SearchFilterForm()
 
     # Query aufbauen
     query = Material.query
@@ -167,13 +167,15 @@ def delete_material(id):
 @admin_required
 def bulk_add_materials():
     """Mehrere Materialien auf einmal hinzufügen"""
-    form = BulkMaterialForm()
-
-    if form.validate_on_submit():
+    if request.method == 'POST':
+        materials_text = request.form.get('materials_text', '')
+        default_kategorie = request.form.get('default_kategorie', '')
+        default_einheit = request.form.get('default_einheit', 'Stück')
+        
         added_count = 0
         error_count = 0
 
-        lines = form.materials_text.data.strip().split('\n')
+        lines = materials_text.strip().split('\n')
 
         for line in lines:
             line = line.strip()
@@ -182,8 +184,8 @@ def bulk_add_materials():
 
             parts = line.split('|')
             name = parts[0].strip()
-            kategorie = parts[1].strip() if len(parts) > 1 and parts[1].strip() else form.default_kategorie.data
-            einheit = parts[2].strip() if len(parts) > 2 and parts[2].strip() else form.default_einheit.data
+            kategorie = parts[1].strip() if len(parts) > 1 and parts[1].strip() else default_kategorie
+            einheit = parts[2].strip() if len(parts) > 2 and parts[2].strip() else default_einheit
 
             # Prüfen ob Material bereits existiert
             existing = Material.query.filter_by(name=name).first()
@@ -213,7 +215,7 @@ def bulk_add_materials():
             db.session.rollback()
             flash('Fehler beim Speichern der Materialien.', 'error')
 
-    return render_template('admin/bulk_material_form.html', form=form)
+    return render_template('admin/bulk_material_form.html')
 
 
 @admin_bp.route('/materials/toggle/<int:id>', methods=['POST'])

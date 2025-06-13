@@ -7,7 +7,7 @@ services:
       - "5000:5000"
     environment:
       - FLASK_ENV=production
-      - DATABASE_URL=postgresql://bautagebuch:password@db:5432/bautagebuch
+      - DATABASE_URL=postgresql://bautagebuch:${POSTGRES_PASSWORD:-change-this-password}@db:5432/bautagebuch
       - REDIS_URL=redis://redis:6379/0
       - SECRET_KEY=${SECRET_KEY:-your-secret-key-here}
       - MAIL_SERVER=${MAIL_SERVER}
@@ -32,7 +32,7 @@ services:
     environment:
       - POSTGRES_DB=bautagebuch
       - POSTGRES_USER=bautagebuch
-      - POSTGRES_PASSWORD=password
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-change-this-password}
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./backups:/backups
@@ -73,8 +73,8 @@ services:
     environment:
       - POSTGRES_DB=bautagebuch
       - POSTGRES_USER=bautagebuch
-      - POSTGRES_PASSWORD=password
-      - PGPASSWORD=password
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-change-this-password}
+      - PGPASSWORD=${POSTGRES_PASSWORD:-change-this-password}
     volumes:
       - ./backups:/backups
       - postgres_data:/var/lib/postgresql/data:ro
@@ -111,7 +111,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-change-this-password}
     volumes:
       - grafana_data:/var/lib/grafana
       - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro

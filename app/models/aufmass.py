@@ -1,5 +1,5 @@
 from app import db
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy import Column, Integer, String, Float, DateTime, Text, ForeignKey, Boolean, Index
 from sqlalchemy.orm import relationship
 
@@ -19,7 +19,7 @@ class AufmassEntry(db.Model):
     raumnummer = Column(String(50), nullable=True)
     menge = Column(Float, nullable=False)
     einheit = Column(String(20), nullable=True)
-    datum = Column(DateTime, nullable=False, default=datetime.utcnow, index=True)
+    datum = Column(DateTime, nullable=False, default=lambda: datetime.now(timezone.utc), index=True)
     bemerkungen = Column(Text, nullable=True)
 
     # Status-Felder
@@ -27,8 +27,8 @@ class AufmassEntry(db.Model):
     is_approved = Column(Boolean, default=True, index=True)
 
     # Zeitstempel
-    created_at = Column(DateTime, default=datetime.utcnow, index=True)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)
+    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
     # Audit-Trail
     created_by = Column(Integer, ForeignKey('users.id'), nullable=True)
@@ -69,7 +69,7 @@ class AufmassEntry(db.Model):
     def soft_delete(self, user_id=None):
         """Soft delete the entry."""
         self.is_deleted = True
-        self.deleted_at = datetime.utcnow()
+        self.deleted_at = datetime.now(timezone.utc)
         self.deleted_by = user_id
         db.session.commit()
 
@@ -148,7 +148,7 @@ class AufmassDocument(db.Model):
     original_filename = Column(String(255), nullable=False)
     file_type = Column(String(50), nullable=False)
     file_size = Column(Integer, nullable=False)
-    upload_date = Column(DateTime, default=datetime.utcnow, index=True)
+    upload_date = Column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)
     
     # Audit-Trail
     uploaded_by = Column(Integer, ForeignKey('users.id'), nullable=True)
@@ -169,7 +169,7 @@ class AufmassDocument(db.Model):
     def soft_delete(self, user_id=None):
         """Soft delete the document."""
         self.is_deleted = True
-        self.deleted_at = datetime.utcnow()
+        self.deleted_at = datetime.now(timezone.utc)
         self.deleted_by = user_id
         db.session.commit()
 

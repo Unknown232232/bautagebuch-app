@@ -1,5 +1,5 @@
 from app import db
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy import event, Index
 from sqlalchemy import Column, Integer, String, Text, Date, DateTime, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
@@ -15,8 +15,8 @@ class Bautagebuch(db.Model):
     projekt_name = Column(String(200), nullable=False, index=True)
     projekt_nummer = Column(String(100), nullable=True, index=True)
     bauleiter = Column(String(100), nullable=False)
-    erstellt_am = Column(DateTime, default=datetime.utcnow, index=True)
-    aktualisiert_am = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    erstellt_am = Column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)
+    aktualisiert_am = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
     
     # Audit-Trail
     created_by = Column(Integer, ForeignKey('users.id'), nullable=True)
@@ -55,7 +55,7 @@ class BautagebuchEntry(db.Model):
     datum = Column(Date, nullable=False)
     kalenderwoche = Column(Integer, nullable=False)
     jahr = Column(Integer, nullable=False)
-    erstellt_am = Column(DateTime, default=datetime.utcnow)
+    erstellt_am = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     # Beziehungen - String-Referenz statt Import
     aufmass_entry = relationship(
@@ -85,7 +85,7 @@ class WochenExport(db.Model):
     id = Column(Integer, primary_key=True)
     kalenderwoche = Column(Integer, nullable=False)
     jahr = Column(Integer, nullable=False)
-    exportiert_am = Column(DateTime, default=datetime.utcnow)
+    exportiert_am = Column(DateTime, default=lambda: datetime.now(timezone.utc))
     exportiert_von = Column(String(100), nullable=False)
     dateiname = Column(String(200))
 

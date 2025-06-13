@@ -2,7 +2,7 @@
 Benutzermodell für Authentifizierung und Rechteverwaltung
 Kombiniert alle Funktionen aus beiden Versionen
 """
-from datetime import datetime
+from datetime import datetime, timezone
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from app import db
@@ -33,9 +33,9 @@ class User(UserMixin, db.Model):
     nachname = db.Column(db.String(64))
 
     # Zeitstempel
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     last_login = db.Column(db.DateTime)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
     # Beziehungen (konsistent mit den anderen Modellen)
     aufmass_entries = db.relationship('AufmassEntry', back_populates='mitarbeiter', foreign_keys='AufmassEntry.mitarbeiter_id')
@@ -72,7 +72,7 @@ class User(UserMixin, db.Model):
     # --- Status Methoden ---
     def update_last_login(self):
         """Aktualisiert das letzte Login-Datum."""
-        self.last_login = datetime.utcnow()
+        self.last_login = datetime.now(timezone.utc)
         db.session.add(self)
         try:
             db.session.commit()

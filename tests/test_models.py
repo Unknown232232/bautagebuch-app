@@ -307,6 +307,10 @@ class TestAufmassEntry:
             datum=datetime(2024, 1, 15)
         )
         
+        # Beziehungen manuell setzen für den Test
+        entry.mitarbeiter = sample_user
+        entry.material = sample_material
+        
         text = entry.to_bautagebuch_text()
         
         assert '15.01.2024' in text

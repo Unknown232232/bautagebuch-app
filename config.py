@@ -12,6 +12,24 @@ class Config:
     WTF_CSRF_ENABLED = True
     WTF_CSRF_TIME_LIMIT = 3600  # 1 hour
     
+    # Enhanced Security Settings
+    ENCRYPTION_KEY_FILE = os.environ.get('ENCRYPTION_KEY_FILE') or 'instance/encryption.key'
+    PASSWORD_MIN_LENGTH = int(os.environ.get('PASSWORD_MIN_LENGTH', 8))
+    PASSWORD_MAX_AGE_DAYS = int(os.environ.get('PASSWORD_MAX_AGE_DAYS', 90))
+    ACCOUNT_LOCKOUT_ATTEMPTS = int(os.environ.get('ACCOUNT_LOCKOUT_ATTEMPTS', 5))
+    ACCOUNT_LOCKOUT_DURATION = int(os.environ.get('ACCOUNT_LOCKOUT_DURATION', 15))  # minutes
+    
+    # Security Headers (enhanced)
+    SECURITY_HEADERS = {
+        'X-Content-Type-Options': 'nosniff',
+        'X-Frame-Options': 'DENY',
+        'X-XSS-Protection': '1; mode=block',
+        'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
+        'Referrer-Policy': 'strict-origin-when-cross-origin',
+        'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'",
+        'Permissions-Policy': 'geolocation=(), microphone=(), camera=()'
+    }
+    
     # Database
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///bautagebuch.db'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
@@ -31,15 +49,6 @@ class Config:
     SESSION_COOKIE_SECURE = os.environ.get('SESSION_COOKIE_SECURE', 'False').lower() == 'true'
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = 'Lax'
-    
-    # Security Headers
-    SECURITY_HEADERS = {
-        'X-Content-Type-Options': 'nosniff',
-        'X-Frame-Options': 'DENY',
-        'X-XSS-Protection': '1; mode=block',
-        'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
-        'Referrer-Policy': 'strict-origin-when-cross-origin'
-    }
     
     # Rate Limiting
     RATELIMIT_STORAGE_URL = os.environ.get('REDIS_URL') or 'memory://'

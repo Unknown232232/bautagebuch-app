@@ -13,6 +13,11 @@ bautagebuch-app/
 │   ├── static/                   # Statische Dateien (CSS, JS, Bilder)
 │   ├── templates/                # Jinja2 Templates
 │   └── utils/                    # Hilfsfunktionen und Utilities
+├── config/                       # Konfigurationsdateien
+│   ├── config.py                 # Anwendungskonfiguration
+│   └── logging.conf              # Logging-Konfiguration
+├── data/                         # Datenbank und Datendateien (nicht in Git)
+│   └── bautagebuch.db            # SQLite Datenbank
 ├── deployment/                   # Deployment-Konfigurationen
 │   ├── docker-compose.yml        # Docker Compose Setup
 │   ├── Dockerfile                # Docker Container Definition
@@ -32,7 +37,6 @@ bautagebuch-app/
 ├── backups/                      # Backup-Verzeichnis
 ├── instance/                     # Instanz-spezifische Dateien
 ├── logs/                         # Log-Dateien
-├── config.py                     # Anwendungskonfiguration
 ├── requirements.txt              # Python-Abhängigkeiten
 ├── run.py                        # Anwendungsstart
 └── .env.example                  # Umgebungsvariablen-Vorlage

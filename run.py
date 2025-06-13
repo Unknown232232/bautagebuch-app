@@ -12,14 +12,14 @@ import logging
 from logging.config import fileConfig
 from app import create_app, db
 from flask_migrate import upgrade
-from config import config
+from config.config import config
 
 # Pfad hinzufügen
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
 # Logging konfigurieren
-if os.path.exists('logging.conf'):
-    fileConfig('logging.conf')
+if os.path.exists('config/logging.conf'):
+    fileConfig('config/logging.conf')
 
 logger = logging.getLogger(__name__)
 
@@ -80,7 +80,7 @@ def deploy():
 
 def create_directories():
     """Create necessary directories."""
-    directories = ['logs', 'instance', 'instance/uploads', 'backups']
+    directories = ['logs', 'instance', 'instance/uploads', 'backups', 'data']
     for directory in directories:
         if not os.path.exists(directory):
             os.makedirs(directory)

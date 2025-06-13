@@ -6,7 +6,7 @@
     <meta name="description" content="{% block meta_description %}Bautagebuch App - Professionelle Aufmaß- und Bautagebuchverwaltung{% endblock %}">
     <meta name="keywords" content="{% block meta_keywords %}Bautagebuch, Aufmaß, Bauleitung, Dokumentation{% endblock %}">
     <meta name="author" content="Borrmann Professionals">
-    <meta name="csrf-token" content="">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
@@ -16,11 +16,11 @@
     
     <title>{% block title %}Bautagebuch App{% endblock %} | Borrmann Professionals</title>
     
-    <!-- Bootstrap 5.3 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Bootstrap Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
     
     <!-- Custom CSS -->
     <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet">
@@ -28,126 +28,132 @@
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
+    <script>
+        window.onload = () => {
+            lucide.createIcons();
+        };
+    </script>
+    
     {% block extra_css %}{% endblock %}
 </head>
-<body class="{% block body_class %}{% endblock %}">
+<body class="bg-gray-50 min-h-screen {% block body_class %}{% endblock %}">
     <!-- Loading Overlay -->
-    <div id="loadingOverlay" class="loading-overlay">
-        <div class="loading-spinner">
-            <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Laden...</span>
-            </div>
-            <div class="loading-text mt-3">Wird geladen...</div>
+    <div id="loadingOverlay" class="fixed inset-0 bg-white bg-opacity-75 flex items-center justify-center z-50">
+        <div class="text-center">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+            <div class="mt-3 text-gray-600">Wird geladen...</div>
         </div>
     </div>
 
     <!-- Navigation -->
     {% if current_user.is_authenticated %}
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
-        <div class="container-fluid">
-            <!-- Brand -->
-            <a class="navbar-brand d-flex align-items-center" href="{{ url_for('dashboard.index') }}">
-                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Borrmann Professionals" height="32" class="me-2">
-                <span class="fw-bold">Bautagebuch</span>
-            </a>
-
-            <!-- Mobile Toggle -->
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-
-            <!-- Navigation Menu -->
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.endpoint == 'dashboard.index' %}active{% endif %}" 
-                           href="{{ url_for('dashboard.index') }}">
-                            <i class="bi bi-house-door me-1"></i>Dashboard
+    <nav class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <i data-lucide="construction" class="w-8 h-8 text-blue-600"></i>
+                        <span class="ml-2 text-xl font-semibold text-gray-900">Bautagebuch</span>
+                    </div>
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="{{ url_for('dashboard.index') }}" 
+                           class="{% if request.endpoint == 'dashboard.index' %}bg-blue-100 text-blue-700{% else %}text-gray-500 hover:text-gray-700{% endif %} px-3 py-2 rounded-md text-sm font-medium">
+                            Dashboard
                         </a>
-                    </li>
-                    
-                    {% if current_user.role in ['mitarbeiter', 'bauleiter', 'admin'] %}
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.endpoint == 'aufmass.eingabe' %}active{% endif %}" 
-                           href="{{ url_for('aufmass.eingabe') }}">
-                            <i class="bi bi-plus-circle me-1"></i>Aufmaß eingeben
+                        
+                        {% if current_user.role in ['mitarbeiter', 'bauleiter', 'admin'] %}
+                        <a href="{{ url_for('aufmass.eingabe') }}" 
+                           class="{% if request.endpoint == 'aufmass.eingabe' %}bg-blue-100 text-blue-700{% else %}text-gray-500 hover:text-gray-700{% endif %} px-3 py-2 rounded-md text-sm font-medium">
+                            Aufmaß eingeben
                         </a>
-                    </li>
-                    {% endif %}
-                    
-                    {% if current_user.role in ['bauleiter', 'admin'] %}
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.endpoint == 'wochenbericht.wochenbericht_uebersicht' %}active{% endif %}" 
-                           href="{{ url_for('wochenbericht.wochenbericht_uebersicht') }}">
-                            <i class="bi bi-calendar-week me-1"></i>Wochenbericht
+                        <a href="{{ url_for('aufmass.liste') }}" 
+                           class="{% if request.endpoint == 'aufmass.liste' %}bg-blue-100 text-blue-700{% else %}text-gray-500 hover:text-gray-700{% endif %} px-3 py-2 rounded-md text-sm font-medium">
+                            Aufmaße
                         </a>
-                    </li>
-                    {% endif %}
-                    
-                    {% if current_user.role == 'admin' %}
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                            <i class="bi bi-gear me-1"></i>Admin
+                        {% endif %}
+                        
+                        {% if current_user.role in ['bauleiter', 'admin'] %}
+                        <a href="{{ url_for('wochenbericht.wochenbericht_uebersicht') }}" 
+                           class="{% if request.endpoint == 'wochenbericht.wochenbericht_uebersicht' %}bg-blue-100 text-blue-700{% else %}text-gray-500 hover:text-gray-700{% endif %} px-3 py-2 rounded-md text-sm font-medium">
+                            Wochenbericht
                         </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{{ url_for('admin.dashboard') }}">
-                                <i class="bi bi-speedometer2 me-2"></i>Admin Panel
-                            </a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('admin.materials') }}">
-                                <i class="bi bi-box me-2"></i>Materialverwaltung
-                            </a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('duplikate.duplikate_uebersicht') }}">
-                                <i class="bi bi-files me-2"></i>Duplikate prüfen
-                            </a></li>
-                        </ul>
-                    </li>
-                    {% endif %}
-                </ul>
-
-                <!-- User Menu -->
-                <ul class="navbar-nav">
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
-                            <div class="user-avatar me-2">
-                                <i class="bi bi-person-circle"></i>
+                        {% endif %}
+                        
+                        {% if current_user.role == 'admin' %}
+                        <div class="relative group">
+                            <button class="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium flex items-center">
+                                Admin
+                                <i data-lucide="chevron-down" class="w-4 h-4 ml-1"></i>
+                            </button>
+                            <div class="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                                <a href="{{ url_for('admin.dashboard') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <i data-lucide="gauge" class="w-4 h-4 inline mr-2"></i>Admin Panel
+                                </a>
+                                <a href="{{ url_for('admin.materials') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <i data-lucide="package" class="w-4 h-4 inline mr-2"></i>Materialverwaltung
+                                </a>
+                                <a href="{{ url_for('duplikate.duplikate_uebersicht') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <i data-lucide="copy" class="w-4 h-4 inline mr-2"></i>Duplikate prüfen
+                                </a>
                             </div>
-                            <span class="d-none d-md-inline">{{ current_user.username }}</span>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><h6 class="dropdown-header">
-                                <i class="bi bi-person me-2"></i>{{ current_user.username }}
-                                <small class="text-muted d-block">{{ current_user.role.title() }}</small>
-                            </h6></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="{{ url_for('auth.change_password') }}">
-                                <i class="bi bi-person-gear me-2"></i>Profil bearbeiten
-                            </a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('auth.change_password') }}">
-                                <i class="bi bi-key me-2"></i>Passwort ändern
-                            </a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item text-danger" href="{{ url_for('auth.logout') }}">
-                                <i class="bi bi-box-arrow-right me-2"></i>Abmelden
-                            </a></li>
-                        </ul>
-                    </li>
-                </ul>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="relative group">
+                        <button class="flex items-center text-sm text-gray-700 hover:text-gray-900">
+                            <i data-lucide="user" class="w-5 h-5 mr-2"></i>
+                            <span>{{ current_user.username }}</span>
+                            <i data-lucide="chevron-down" class="w-4 h-4 ml-1"></i>
+                        </button>
+                        <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                            <div class="px-4 py-2 border-b border-gray-100">
+                                <p class="text-sm font-medium text-gray-900">{{ current_user.username }}</p>
+                                <p class="text-xs text-gray-500">{{ current_user.role.title() }}</p>
+                            </div>
+                            <a href="{{ url_for('auth.change_password') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <i data-lucide="settings" class="w-4 h-4 inline mr-2"></i>Profil bearbeiten
+                            </a>
+                            <a href="{{ url_for('auth.change_password') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <i data-lucide="key" class="w-4 h-4 inline mr-2"></i>Passwort ändern
+                            </a>
+                            <div class="border-t border-gray-100"></div>
+                            <a href="{{ url_for('auth.logout') }}" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50">
+                                <i data-lucide="log-out" class="w-4 h-4 inline mr-2"></i>Abmelden
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </nav>
     {% endif %}
 
     <!-- Main Content -->
-    <main class="{% if current_user.is_authenticated %}main-content{% endif %}">
+    <main class="{% if current_user.is_authenticated %}pt-16{% endif %}">
         <!-- Flash Messages -->
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
-                <div class="container-fluid mt-3">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
                     {% for category, message in messages %}
-                        <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
-                            <i class="bi bi-{% if category == 'success' %}check-circle{% elif category == 'warning' %}exclamation-triangle{% elif category == 'error' %}x-circle{% else %}info-circle{% endif %} me-2"></i>
-                            {{ message }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        <div class="mb-4 p-4 rounded-lg {% if category == 'error' %}bg-red-50 text-red-700 border border-red-200{% elif category == 'success' %}bg-green-50 text-green-700 border border-green-200{% elif category == 'warning' %}bg-yellow-50 text-yellow-700 border border-yellow-200{% else %}bg-blue-50 text-blue-700 border border-blue-200{% endif %}">
+                            <div class="flex">
+                                <div class="flex-shrink-0">
+                                    {% if category == 'error' %}
+                                        <i data-lucide="alert-circle" class="w-5 h-5"></i>
+                                    {% elif category == 'success' %}
+                                        <i data-lucide="check-circle" class="w-5 h-5"></i>
+                                    {% elif category == 'warning' %}
+                                        <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+                                    {% else %}
+                                        <i data-lucide="info" class="w-5 h-5"></i>
+                                    {% endif %}
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-sm font-medium">{{ message }}</p>
+                                </div>
+                            </div>
                         </div>
                     {% endfor %}
                 </div>
@@ -159,29 +165,22 @@
     </main>
 
     <!-- Footer -->
-    <footer class="footer bg-light border-top mt-auto">
-        <div class="container-fluid py-3">
-            <div class="row align-items-center">
-                <div class="col-md-6">
-                    <div class="d-flex align-items-center">
-                        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Borrmann Professionals" height="24" class="me-2">
-                        <small class="text-muted">
-                            © 2025 Borrmann Professionals. Alle Rechte vorbehalten.
-                        </small>
-                    </div>
+    <footer class="bg-white border-t border-gray-200 mt-auto">
+        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <i data-lucide="construction" class="w-6 h-6 text-blue-600 mr-2"></i>
+                    <span class="text-sm text-gray-600">
+                        © 2025 Borrmann Professionals. Alle Rechte vorbehalten.
+                    </span>
                 </div>
-                <div class="col-md-6 text-md-end">
-                    <small>
-                        <span class="text-muted">Version 1.0</span>
-                    </small>
+                <div class="text-sm text-gray-500">
+                    Version 1.0
                 </div>
             </div>
         </div>
     </footer>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    
     <!-- Custom JavaScript -->
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
     
@@ -206,7 +205,11 @@
             navLinks.forEach(link => {
                 link.addEventListener('click', function(e) {
                     if (!e.defaultPrevented) {
-                        showLoading();
+                        const loadingOverlay = document.getElementById('loadingOverlay');
+                        if (loadingOverlay) {
+                            loadingOverlay.style.display = 'flex';
+                            loadingOverlay.style.opacity = '1';
+                        }
                     }
                 });
             });

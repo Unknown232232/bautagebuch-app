@@ -1,0 +1,273 @@
+{% extends "base.html" %}
+
+{% block title %}Dark Mode Demo{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Header -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">Dark Mode Demo</h1>
+        <p class="text-gray-600">Testen Sie den Dark Mode mit verschiedenen UI-Komponenten</p>
+    </div>
+
+    <!-- Theme Controls -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+        <h2 class="text-xl font-semibold text-gray-900 mb-4">Theme Steuerung</h2>
+        <div class="flex flex-wrap gap-4">
+            <button onclick="window.DarkModeManager.setTheme('light')" 
+                    class="btn btn-secondary">
+                <i data-lucide="sun" class="w-4 h-4"></i>
+                Light Mode
+            </button>
+            <button onclick="window.DarkModeManager.setTheme('dark')" 
+                    class="btn btn-secondary">
+                <i data-lucide="moon" class="w-4 h-4"></i>
+                Dark Mode
+            </button>
+            <button onclick="window.DarkModeManager.toggleTheme()" 
+                    class="btn btn-primary">
+                <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                Toggle Theme
+            </button>
+            <button onclick="window.DarkModeManager.resetToSystemPreference()" 
+                    class="btn btn-secondary">
+                <i data-lucide="monitor" class="w-4 h-4"></i>
+                System Theme
+            </button>
+        </div>
+        <div class="mt-4 p-3 bg-gray-100 rounded-md">
+            <p class="text-sm text-gray-700">
+                <strong>Aktuelles Theme:</strong> 
+                <span id="current-theme">Loading...</span>
+            </p>
+        </div>
+    </div>
+
+    <!-- Cards Demo -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="text-lg font-semibold">Statistik Card</h3>
+            </div>
+            <div class="card-body">
+                <div class="stat-number">1,234</div>
+                <div class="stat-label">Aufmaße gesamt</div>
+                <div class="stat-trend positive">
+                    <i data-lucide="trending-up" class="w-4 h-4"></i>
+                    +12% diese Woche
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="text-lg font-semibold">Form Card</h3>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label class="form-label">Name</label>
+                    <input type="text" class="form-control" placeholder="Ihr Name">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">E-Mail</label>
+                    <input type="email" class="form-control" placeholder="ihre@email.de">
+                </div>
+                <button class="btn btn-primary">Speichern</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="text-lg font-semibold">Status Badges</h3>
+            </div>
+            <div class="card-body">
+                <div class="flex flex-wrap gap-2">
+                    <span class="badge badge-primary">Primary</span>
+                    <span class="badge badge-success">Success</span>
+                    <span class="badge badge-warning">Warning</span>
+                    <span class="badge badge-danger">Danger</span>
+                    <span class="badge badge-secondary">Secondary</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Buttons Demo -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+        <h2 class="text-xl font-semibold text-gray-900 mb-4">Button Varianten</h2>
+        <div class="flex flex-wrap gap-4">
+            <button class="btn btn-primary">Primary Button</button>
+            <button class="btn btn-secondary">Secondary Button</button>
+            <button class="btn btn-success">Success Button</button>
+            <button class="btn btn-warning">Warning Button</button>
+            <button class="btn btn-danger">Danger Button</button>
+        </div>
+        <div class="mt-4 flex flex-wrap gap-4">
+            <button class="btn btn-primary btn-sm">Small Button</button>
+            <button class="btn btn-primary">Normal Button</button>
+            <button class="btn btn-primary btn-lg">Large Button</button>
+        </div>
+    </div>
+
+    <!-- Table Demo -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+        <h2 class="text-xl font-semibold text-gray-900 mb-4">Tabelle</h2>
+        <div class="table-container">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Status</th>
+                        <th>Datum</th>
+                        <th>Aktionen</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>001</td>
+                        <td>Projekt Alpha</td>
+                        <td><span class="badge badge-success">Aktiv</span></td>
+                        <td>14.06.2025</td>
+                        <td>
+                            <button class="btn btn-sm btn-primary">Bearbeiten</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>002</td>
+                        <td>Projekt Beta</td>
+                        <td><span class="badge badge-warning">Wartend</span></td>
+                        <td>13.06.2025</td>
+                        <td>
+                            <button class="btn btn-sm btn-primary">Bearbeiten</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>003</td>
+                        <td>Projekt Gamma</td>
+                        <td><span class="badge badge-danger">Gestoppt</span></td>
+                        <td>12.06.2025</td>
+                        <td>
+                            <button class="btn btn-sm btn-primary">Bearbeiten</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Alerts Demo -->
+    <div class="space-y-4 mb-8">
+        <div class="alert alert-success">
+            <i data-lucide="check-circle" class="w-5 h-5 inline mr-2"></i>
+            Dies ist eine Erfolgs-Nachricht im aktuellen Theme.
+        </div>
+        <div class="alert alert-warning">
+            <i data-lucide="alert-triangle" class="w-5 h-5 inline mr-2"></i>
+            Dies ist eine Warn-Nachricht im aktuellen Theme.
+        </div>
+        <div class="alert alert-danger">
+            <i data-lucide="alert-circle" class="w-5 h-5 inline mr-2"></i>
+            Dies ist eine Fehler-Nachricht im aktuellen Theme.
+        </div>
+        <div class="alert alert-info">
+            <i data-lucide="info" class="w-5 h-5 inline mr-2"></i>
+            Dies ist eine Info-Nachricht im aktuellen Theme.
+        </div>
+    </div>
+
+    <!-- Modal Demo -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+        <h2 class="text-xl font-semibold text-gray-900 mb-4">Modal Demo</h2>
+        <button onclick="showDemoModal()" class="btn btn-primary">
+            <i data-lucide="external-link" class="w-4 h-4"></i>
+            Modal öffnen
+        </button>
+    </div>
+
+    <!-- Toast Demo -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-xl font-semibold text-gray-900 mb-4">Toast Notifications</h2>
+        <div class="flex flex-wrap gap-4">
+            <button onclick="showToast('success')" class="btn btn-success">Success Toast</button>
+            <button onclick="showToast('warning')" class="btn btn-warning">Warning Toast</button>
+            <button onclick="showToast('danger')" class="btn btn-danger">Error Toast</button>
+            <button onclick="showToast('info')" class="btn btn-secondary">Info Toast</button>
+        </div>
+    </div>
+</div>
+
+<!-- Demo Modal -->
+<div id="demo-modal" class="modal-overlay">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 class="modal-title">Demo Modal</h3>
+            <button class="modal-close" onclick="hideDemoModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p>Dies ist ein Demo-Modal im aktuellen Theme. Beachten Sie, wie sich die Farben und Schatten an das gewählte Theme anpassen.</p>
+            <div class="form-group">
+                <label class="form-label">Beispiel Input</label>
+                <input type="text" class="form-control" placeholder="Eingabe hier...">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="hideDemoModal()">Abbrechen</button>
+            <button class="btn btn-primary">Speichern</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Update current theme display
+function updateThemeDisplay() {
+    const currentTheme = window.DarkModeManager.getCurrentTheme();
+    document.getElementById('current-theme').textContent = currentTheme === 'dark' ? 'Dark Mode' : 'Light Mode';
+}
+
+// Listen for theme changes
+window.addEventListener('themeChanged', updateThemeDisplay);
+
+// Initial update
+document.addEventListener('DOMContentLoaded', updateThemeDisplay);
+
+// Modal functions
+function showDemoModal() {
+    document.getElementById('demo-modal').classList.add('active');
+}
+
+function hideDemoModal() {
+    document.getElementById('demo-modal').classList.remove('active');
+}
+
+// Toast functions
+function showToast(type) {
+    const messages = {
+        success: 'Erfolgreich! Dies ist eine Success-Nachricht.',
+        warning: 'Achtung! Dies ist eine Warn-Nachricht.',
+        danger: 'Fehler! Dies ist eine Fehler-Nachricht.',
+        info: 'Information: Dies ist eine Info-Nachricht.'
+    };
+    
+    if (window.BautagebuchApp && window.BautagebuchApp.showToast) {
+        window.BautagebuchApp.showToast(messages[type], type, 4000);
+    }
+}
+
+// Close modal on outside click
+document.getElementById('demo-modal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        hideDemoModal();
+    }
+});
+
+// Close modal on escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        hideDemoModal();
+    }
+});
+</script>
+{% endblock %}

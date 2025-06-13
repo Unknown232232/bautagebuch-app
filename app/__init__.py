@@ -169,6 +169,10 @@ def create_app(config_name=None):
     from .routes.kabel import kabel_bp
     app.register_blueprint(kabel_bp, url_prefix='/kabel')
 
+    # Dark Mode Demo Blueprint
+    from .routes.darkmode_demo import darkmode_demo_bp
+    app.register_blueprint(darkmode_demo_bp)
+
     # Root route - redirect to login or dashboard
     @app.route('/')
     def index():

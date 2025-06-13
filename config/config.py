@@ -48,6 +48,9 @@ class Config:
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = 'Lax'
     
+    # Session invalidation file for shutdown tracking
+    SESSION_INVALIDATION_FILE = os.environ.get('SESSION_INVALIDATION_FILE') or 'instance/session_invalidation.txt'
+    
     # Rate Limiting
     RATELIMIT_STORAGE_URL = os.environ.get('REDIS_URL') or 'memory://'
     RATELIMIT_DEFAULT = "100 per hour"

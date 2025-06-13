@@ -31,6 +31,10 @@ def login():
             login_user(user, remember=form.remember_me.data)
             user.update_last_login()
             
+            # Store login time in session for shutdown validation
+            session['login_time'] = datetime.utcnow().isoformat()
+            session.permanent = True
+            
             # Prüfen ob Passwort geändert werden muss
             if user.requires_password_change():
                 flash('Sie müssen Ihr Passwort beim ersten Login ändern.', 'warning')
@@ -42,6 +46,7 @@ def login():
                 next_page = url_for('dashboard.index')
             
             flash(f'Willkommen zurück, {user.username}!', 'success')
+            logger.info(f"User login successful: {user.username} at {session['login_time']}")
             return redirect(next_page)
         else:
             flash('Ungültiger Benutzername oder Passwort', 'error')

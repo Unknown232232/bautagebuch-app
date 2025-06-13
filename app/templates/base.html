@@ -82,19 +82,21 @@
                                 Admin
                                 <i data-lucide="chevron-down" class="w-4 h-4 ml-1"></i>
                             </button>
-                            <div class="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-                                <a href="{{ url_for('admin.dashboard') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                    <i data-lucide="gauge" class="w-4 h-4 inline mr-2"></i>Admin Panel
-                                </a>
-                                <a href="{{ url_for('admin.materials') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                    <i data-lucide="package" class="w-4 h-4 inline mr-2"></i>Materialverwaltung
-                                </a>
-                                <a href="{{ url_for('admin.users') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                    <i data-lucide="users" class="w-4 h-4 inline mr-2"></i>Benutzerverwaltung
-                                </a>
-                                <a href="{{ url_for('duplikate.duplikate_uebersicht') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                    <i data-lucide="copy" class="w-4 h-4 inline mr-2"></i>Duplikate prüfen
-                                </a>
+                            <div class="absolute left-0 top-full pt-1 w-48 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                                <div class="bg-white rounded-md shadow-lg py-1 border border-gray-200">
+                                    <a href="{{ url_for('admin.dashboard') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        <i data-lucide="gauge" class="w-4 h-4 inline mr-2"></i>Admin Panel
+                                    </a>
+                                    <a href="{{ url_for('admin.materials') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        <i data-lucide="package" class="w-4 h-4 inline mr-2"></i>Materialverwaltung
+                                    </a>
+                                    <a href="{{ url_for('admin.users') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        <i data-lucide="users" class="w-4 h-4 inline mr-2"></i>Benutzerverwaltung
+                                    </a>
+                                    <a href="{{ url_for('duplikate.duplikate_uebersicht') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        <i data-lucide="copy" class="w-4 h-4 inline mr-2"></i>Duplikate prüfen
+                                    </a>
+                                </div>
                             </div>
                         </div>
                         {% endif %}
@@ -107,21 +109,23 @@
                             <span>{{ current_user.username }}</span>
                             <i data-lucide="chevron-down" class="w-4 h-4 ml-1"></i>
                         </button>
-                        <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-                            <div class="px-4 py-2 border-b border-gray-100">
-                                <p class="text-sm font-medium text-gray-900">{{ current_user.username }}</p>
-                                <p class="text-xs text-gray-500">{{ current_user.role.title() }}</p>
+                        <div class="absolute right-0 top-full pt-1 w-48 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                            <div class="bg-white rounded-md shadow-lg py-1 border border-gray-200">
+                                <div class="px-4 py-2 border-b border-gray-100">
+                                    <p class="text-sm font-medium text-gray-900">{{ current_user.username }}</p>
+                                    <p class="text-xs text-gray-500">{{ current_user.role.title() }}</p>
+                                </div>
+                                <a href="{{ url_for('auth.profile') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <i data-lucide="settings" class="w-4 h-4 inline mr-2"></i>Profil bearbeiten
+                                </a>
+                                <a href="{{ url_for('auth.change_password') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <i data-lucide="key" class="w-4 h-4 inline mr-2"></i>Passwort ändern
+                                </a>
+                                <div class="border-t border-gray-100"></div>
+                                <a href="{{ url_for('auth.logout') }}" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50">
+                                    <i data-lucide="log-out" class="w-4 h-4 inline mr-2"></i>Abmelden
+                                </a>
                             </div>
-                            <a href="{{ url_for('auth.profile') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                <i data-lucide="settings" class="w-4 h-4 inline mr-2"></i>Profil bearbeiten
-                            </a>
-                            <a href="{{ url_for('auth.change_password') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                <i data-lucide="key" class="w-4 h-4 inline mr-2"></i>Passwort ändern
-                            </a>
-                            <div class="border-t border-gray-100"></div>
-                            <a href="{{ url_for('auth.logout') }}" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50">
-                                <i data-lucide="log-out" class="w-4 h-4 inline mr-2"></i>Abmelden
-                            </a>
                         </div>
                     </div>
                 </div>

@@ -3,10 +3,12 @@ Flask App Factory für Bautagebuch
 """
 import os
 import logging
-from flask import Flask, request, jsonify
+import signal
+import atexit
+from flask import Flask, request, jsonify, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-from flask_login import LoginManager
+from flask_login import LoginManager, logout_user
 from flask_mail import Mail
 from flask_caching import Cache
 from flask_limiter import Limiter
@@ -186,6 +188,80 @@ def create_app(config_name=None):
     # Create upload directory
     upload_dir = os.path.join(app.instance_path, 'uploads')
     os.makedirs(upload_dir, exist_ok=True)
+
+    # Session cleanup on shutdown
+    def cleanup_sessions():
+        """Clean up all active sessions when the application shuts down."""
+        try:
+            from datetime import datetime
+            invalidation_time = datetime.utcnow().isoformat()
+            
+            # Write invalidation time to file for persistence
+            invalidation_file = app.config.get('SESSION_INVALIDATION_FILE', 'instance/session_invalidation.txt')
+            os.makedirs(os.path.dirname(invalidation_file), exist_ok=True)
+            
+            with open(invalidation_file, 'w') as f:
+                f.write(invalidation_time)
+            
+            app.config['SESSION_INVALIDATION_TIME'] = invalidation_time
+            logger.info(f"All user sessions invalidated due to application shutdown at {invalidation_time}")
+        except Exception as e:
+            logger.error(f"Error during session cleanup: {e}")
+
+    def signal_handler(signum, frame):
+        """Handle shutdown signals."""
+        logger.info(f"Received signal {signum}, cleaning up sessions...")
+        cleanup_sessions()
+        logger.info("Application shutdown complete")
+
+    # Register signal handlers for graceful shutdown
+    signal.signal(signal.SIGTERM, signal_handler)
+    signal.signal(signal.SIGINT, signal_handler)
+    
+    # Register cleanup function to run at exit
+    atexit.register(cleanup_sessions)
+
+    # Load session invalidation time from file on startup
+    def load_session_invalidation_time():
+        """Load session invalidation time from file if it exists."""
+        try:
+            invalidation_file = app.config.get('SESSION_INVALIDATION_FILE', 'instance/session_invalidation.txt')
+            if os.path.exists(invalidation_file):
+                with open(invalidation_file, 'r') as f:
+                    invalidation_time = f.read().strip()
+                    if invalidation_time:
+                        app.config['SESSION_INVALIDATION_TIME'] = invalidation_time
+                        logger.info(f"Loaded session invalidation time from file: {invalidation_time}")
+        except Exception as e:
+            logger.error(f"Error loading session invalidation time: {e}")
+
+    # Load invalidation time on startup
+    load_session_invalidation_time()
+
+    # Add session validation middleware
+    @app.before_request
+    def validate_session():
+        """Validate session on each request."""
+        if request.endpoint and request.endpoint.startswith('static'):
+            return
+            
+        # Check if session should be invalidated
+        invalidation_time = app.config.get('SESSION_INVALIDATION_TIME')
+        if invalidation_time and 'login_time' in session:
+            from datetime import datetime
+            try:
+                session_time = datetime.fromisoformat(session['login_time'])
+                invalid_time = datetime.fromisoformat(invalidation_time)
+                if session_time < invalid_time:
+                    session.clear()
+                    from flask_login import current_user
+                    if current_user.is_authenticated:
+                        logout_user()
+                        from flask import flash, redirect, url_for
+                        flash('Ihre Sitzung wurde aufgrund eines Anwendungsneustarts beendet. Bitte melden Sie sich erneut an.', 'warning')
+                        return redirect(url_for('auth.login'))
+            except (ValueError, KeyError):
+                pass
 
     logger.info(f"Bautagebuch App initialized in {config_name} mode")
     return app
